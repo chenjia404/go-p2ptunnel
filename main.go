@@ -224,11 +224,11 @@ func main() {
 			dconn, err := net.Dial("tcp", *ip)
 			if err != nil {
 				fmt.Printf("连接%v失败:%v\n", ip, err)
+				s.Close()
+				return
 			} else {
 				fmt.Printf("转发:%s\n", *ip)
 			}
-			//s.Scope()
-			//go doStreamPipe(ctx, dconn, s)
 			go pipe(dconn, s)
 		})
 
