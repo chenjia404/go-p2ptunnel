@@ -200,6 +200,7 @@ func main() {
 
 	ip := flag.String("l", "127.0.0.1:10086", "forwarder to ip or listen ip")
 	id := flag.String("id", "", "Destination multiaddr id string")
+	networkType := flag.String("type", "tcp", "network type tcp/udp")
 	flag.Parse()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -221,7 +222,7 @@ func main() {
 		h.SetStreamHandler(Protocol, func(s network.Stream) {
 
 			fmt.Println("新客户端\n")
-			dconn, err := net.Dial("tcp", *ip)
+			dconn, err := net.Dial(*networkType, *ip)
 			if err != nil {
 				fmt.Printf("连接%v失败:%v\n", ip, err)
 				s.Close()
@@ -256,7 +257,7 @@ func main() {
 		} else {
 			fmt.Printf("连接成功", info.ID.String(), "\n")
 
-			lis, err := net.Listen("tcp", *ip)
+			lis, err := net.Listen(*networkType, *ip)
 			if err != nil {
 				fmt.Println("Listen:", err)
 				return
