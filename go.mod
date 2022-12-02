@@ -3,9 +3,9 @@ module github.com/chenjia404/go-p2ptunnel
 go 1.19
 
 require (
-	github.com/libp2p/go-libp2p v0.23.3
+	github.com/libp2p/go-libp2p v0.23.4
 	github.com/libp2p/go-libp2p-kad-dht v0.18.0
-	github.com/multiformats/go-multiaddr v0.7.0
+	github.com/multiformats/go-multiaddr v0.8.0
 )
 
 require (
