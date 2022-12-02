@@ -262,7 +262,7 @@ func main() {
 		if err != nil {
 			log.Println("Connect:", err)
 		} else {
-			fmt.Printf("连接成功", info.ID.String(), "\n")
+			fmt.Printf("连接成功%s\n", info.ID.String())
 
 			lis, err := net.Listen(*networkType, *ip)
 			if err != nil {
