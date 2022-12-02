@@ -193,8 +193,15 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 	return h, err
 }
 
+var (
+	version   = "0.0.1"
+	gitRev    = ""
+	buildTime = ""
+)
+
 func main() {
-	fmt.Printf("v %d\n", 3)
+	fmt.Printf("p2ptunnel %s-%s\n", version, gitRev)
+	fmt.Printf("buildTime %s\n", buildTime)
 	fmt.Printf("System version: %s\n", runtime.GOARCH+"/"+runtime.GOOS)
 	fmt.Printf("Golang version: %s\n", runtime.Version())
 
