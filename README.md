@@ -1,6 +1,10 @@
 ## go-p2ptunnel
 
-使用libp2p建立tcp或者udp隧道，底层传输可以使用quic、tcp、ws、webtransport实现，自带nat，可以多层组合使用。
+使用libp2p建立tcp隧道(不支持udp)，底层传输可以使用quic、tcp、ws、webtransport实现，自带nat，可以多层组合使用。
+
+libp2p底层自带加密，同时有大量的libp2p节点，很容易寻找到相关节点。
+
+服务端可以多开实例，避免出现 resource limit exceeded 错误(后续优化)
 
 节点私钥文件在当前目录下 user.key
 
