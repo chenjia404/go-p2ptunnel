@@ -9,7 +9,6 @@ import (
 	"github.com/libp2p/go-libp2p/core/peerstore"
 	"github.com/libp2p/go-libp2p/core/routing"
 	routing2 "github.com/libp2p/go-libp2p/p2p/discovery/routing"
-	"github.com/libp2p/go-libp2p/p2p/host/autorelay"
 	"github.com/libp2p/go-libp2p/p2p/security/noise"
 	libp2ptls "github.com/libp2p/go-libp2p/p2p/security/tls"
 	"github.com/multiformats/go-multiaddr"
@@ -27,7 +26,6 @@ import (
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/p2p/net/connmgr"
-	webtransport "github.com/libp2p/go-libp2p/p2p/transport/webtransport"
 )
 
 const Protocol = "/p2ptunnel/0.1"
@@ -114,7 +112,6 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 		),
 
 		libp2p.DefaultTransports,
-		libp2p.Transport(webtransport.New),
 
 		libp2p.Security(noise.ID, noise.New),
 		libp2p.Security(libp2ptls.ID, libp2ptls.New),
@@ -127,7 +124,6 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 		libp2p.EnableNATService(),
 		libp2p.EnableRelayService(),
 		libp2p.ForceReachabilityPublic(),
-		libp2p.EnableAutoRelay(autorelay.WithDefaultStaticRelays(), autorelay.WithCircuitV1Support(), autorelay.WithNumRelays(20)),
 		libp2p.DefaultPeerstore,
 
 		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
