@@ -4,14 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/libp2p/go-libp2p"
-	"github.com/libp2p/go-libp2p/core/network"
-	"github.com/libp2p/go-libp2p/core/peerstore"
-	"github.com/libp2p/go-libp2p/core/routing"
-	routing2 "github.com/libp2p/go-libp2p/p2p/discovery/routing"
-	"github.com/libp2p/go-libp2p/p2p/security/noise"
-	libp2ptls "github.com/libp2p/go-libp2p/p2p/security/tls"
-	"github.com/multiformats/go-multiaddr"
 	"io"
 	"io/ioutil"
 	"log"
@@ -20,6 +12,15 @@ import (
 	"path/filepath"
 	"runtime"
 	"time"
+
+	"github.com/libp2p/go-libp2p"
+	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/libp2p/go-libp2p/core/peerstore"
+	"github.com/libp2p/go-libp2p/core/routing"
+	routing2 "github.com/libp2p/go-libp2p/p2p/discovery/routing"
+	"github.com/libp2p/go-libp2p/p2p/security/noise"
+	libp2ptls "github.com/libp2p/go-libp2p/p2p/security/tls"
+	"github.com/multiformats/go-multiaddr"
 
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/libp2p/go-libp2p/core/crypto"
@@ -88,8 +89,8 @@ var d *dht.IpfsDHT
 func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, error) {
 
 	connmgr_, _ := connmgr.NewConnManager(
-		100,  // Lowwater
-		2000, // HighWater,
+		10,  // Lowwater
+		200, // HighWater,
 		connmgr.WithGracePeriod(time.Minute),
 	)
 
@@ -98,8 +99,8 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 		libp2p.UserAgent("go-p2ptunnel"),
 
 		libp2p.ListenAddrStrings(
-			"/ip4/0.0.0.0/udp/0/quic",
-			"/ip6/::/udp/0/quic",
+			"/ip4/0.0.0.0/udp/0/quic-v1",
+			"/ip6/::/udp/0/quic-v1",
 
 			"/ip4/0.0.0.0/tcp/0",
 			"/ip6/::/tcp/0",
@@ -107,8 +108,8 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 			"/ip4/0.0.0.0/tcp/0/ws",
 			"/ip6/::/tcp/0/ws",
 
-			"/ip4/0.0.0.0/udp/0/quic/webtransport",
-			"/ip6/::/udp/0/quic/webtransport",
+			"/ip4/0.0.0.0/udp/0/quic-v1/webtransport",
+			"/ip6/::/udp/0/quic-v1/webtransport",
 		),
 
 		libp2p.DefaultTransports,
