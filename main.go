@@ -155,7 +155,6 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 
 	go func() {
 		_, err = d1.Advertise(ctx, Protocol)
-
 		if err != nil {
 			log.Println(err)
 		}
@@ -310,6 +309,7 @@ RE:
 			err = h.Connect(ctx, *info)
 			if err != nil {
 				log.Println("Connect:", err)
+				time.Sleep(time.Second * 10)
 			} else {
 				fmt.Printf("连接成功%s\n", info.ID.String())
 
