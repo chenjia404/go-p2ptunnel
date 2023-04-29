@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/chenjia404/go-p2ptunnel/pRuntime"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peerstore"
@@ -191,7 +192,7 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 }
 
 var (
-	version   = "0.0.1"
+	version   = "0.0.2"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -206,6 +207,45 @@ func main() {
 	id := flag.String("id", "", "Destination multiaddr id string")
 	networkType := flag.String("type", "tcp", "network type tcp/udp")
 	flag.Parse()
+
+RE:
+	proc, err := pRuntime.NewProc()
+	if err != nil {
+		fmt.Println("up proc fail........")
+	}
+	//如果proc为nil表示当前进程已经是子进程了
+	//不为空表示当前进程为主进程
+	if proc != nil {
+		go func() {
+			pRuntime.HandleEndSignal(func() {
+				if err := proc.Kill(); err != nil {
+					fmt.Println(err)
+				}
+				fmt.Println("main proc exit....")
+
+				os.Exit(0)
+			})
+		}()
+		//等待子进程退出后 重启
+		err = proc.Wait()
+		if err != nil {
+			fmt.Println("proc wait err........")
+		} else {
+			goto RE
+		}
+		return
+	} else {
+
+		go func() {
+			now := time.Now()
+			next := now.Add(time.Hour * 4)
+			timer := time.NewTimer(next.Sub(now))
+			t := <-timer.C //从定时器拿数据
+			fmt.Println("restart time:", t)
+			os.Exit(0)
+		}()
+
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 
