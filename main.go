@@ -162,28 +162,33 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 	}()
 
 	go func() {
-		peerChan, err := d1.FindPeers(ctx, Protocol)
-		if err != nil {
-			log.Println(err)
-		}
 
-		for peer := range peerChan {
-			if peer.ID == h.ID() {
-				//log.Println("过滤自己")
-				continue
+		for i := 0; i < 10; {
+			log.Println("开始寻找节点")
+			peerChan, err := d1.FindPeers(ctx, Protocol)
+			if err != nil {
+				log.Println(err)
 			}
 
-			if h.Network().Connectedness(peer.ID) != network.Connected {
-				//log.Println("尝试连接:", peer)
-				err = h.Connect(ctx, peer)
-				if err == nil {
-					//log.Println("连接成功", peer)
-					//fmt.Printf("当前连接节点数%d\n", len(h.Network().Peers()))
-				} else {
-					//log.Println(err)
+			for peer := range peerChan {
+				if peer.ID == h.ID() {
+					//log.Println("过滤自己")
+					continue
 				}
-			}
 
+				if h.Network().Connectedness(peer.ID) != network.Connected {
+					//log.Println("尝试连接:", peer)
+					err = h.Connect(ctx, peer)
+					if err == nil {
+						log.Println("连接成功", peer)
+						fmt.Printf("当前连接节点数%d\n", len(h.Network().Peers()))
+						i++
+					} else {
+						//log.Println(err)
+					}
+				}
+
+			}
 		}
 
 	}()
