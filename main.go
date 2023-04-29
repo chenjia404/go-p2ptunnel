@@ -203,16 +203,6 @@ var (
 )
 
 func main() {
-	fmt.Printf("p2ptunnel %s-%s\n", version, gitRev)
-	fmt.Printf("buildTime %s\n", buildTime)
-	fmt.Printf("System version: %s\n", runtime.GOARCH+"/"+runtime.GOOS)
-	fmt.Printf("Golang version: %s\n", runtime.Version())
-
-	ip := flag.String("l", "127.0.0.1:10086", "forwarder to ip or listen ip")
-	id := flag.String("id", "", "Destination multiaddr id string")
-	networkType := flag.String("type", "tcp", "network type tcp/udp")
-	flag.Parse()
-
 RE:
 	proc, err := pRuntime.NewProc()
 	if err != nil {
@@ -251,6 +241,16 @@ RE:
 		}()
 
 	}
+
+	fmt.Printf("p2ptunnel %s-%s\n", version, gitRev)
+	fmt.Printf("buildTime %s\n", buildTime)
+	fmt.Printf("System version: %s\n", runtime.GOARCH+"/"+runtime.GOOS)
+	fmt.Printf("Golang version: %s\n", runtime.Version())
+
+	ip := flag.String("l", "127.0.0.1:10086", "forwarder to ip or listen ip")
+	id := flag.String("id", "", "Destination multiaddr id string")
+	networkType := flag.String("type", "tcp", "network type tcp/udp")
+	flag.Parse()
 
 	ctx, cancel := context.WithCancel(context.Background())
 
