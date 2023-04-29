@@ -164,7 +164,13 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 	go func() {
 
 		for i := 0; i < 10; {
-			log.Println("开始寻找节点")
+			// log.Println("开始寻找节点")
+			_, err = d1.Advertise(ctx, Protocol)
+
+			if err != nil {
+				log.Println(err)
+			}
+
 			peerChan, err := d1.FindPeers(ctx, Protocol)
 			if err != nil {
 				log.Println(err)
@@ -180,8 +186,8 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 					//log.Println("尝试连接:", peer)
 					err = h.Connect(ctx, peer)
 					if err == nil {
-						log.Println("连接成功", peer)
-						fmt.Printf("当前连接节点数%d\n", len(h.Network().Peers()))
+						// log.Println("连接成功", peer.ID)
+						// fmt.Printf("当前连接节点数%d\n", len(h.Network().Peers()))
 						i++
 					} else {
 						//log.Println(err)
@@ -197,7 +203,7 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 }
 
 var (
-	version   = "0.0.2"
+	version   = "0.0.3"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -298,23 +304,23 @@ RE:
 
 		// Add the destination's peer multiaddress in the peerstore.
 		// This will be used during connection and stream creation by libp2p.
-		h.Peerstore().AddAddrs(info.ID, info.Addrs, peerstore.PermanentAddrTTL)
 		time.Sleep(time.Second * 5)
-		err = h.Connect(ctx, *info)
-		if err != nil {
-			log.Println("Connect:", err)
-		} else {
-			fmt.Printf("连接成功%s\n", info.ID.String())
-
-			lis, err := net.Listen(*networkType, *ip)
+		for {
+			h.Peerstore().AddAddrs(info.ID, info.Addrs, peerstore.PermanentAddrTTL)
+			err = h.Connect(ctx, *info)
 			if err != nil {
-				fmt.Println("Listen:", err)
-				return
+				log.Println("Connect:", err)
 			} else {
-				fmt.Printf("监听:%s\n", *ip)
-			}
+				fmt.Printf("连接成功%s\n", info.ID.String())
 
-			go func() {
+				lis, err := net.Listen(*networkType, *ip)
+				if err != nil {
+					fmt.Println("Listen:", err)
+					return
+				} else {
+					fmt.Printf("监听:%s\n", *ip)
+				}
+
 				for {
 					s, err := h.NewStream(ctx, info.ID, Protocol)
 					if err != nil {
@@ -331,9 +337,9 @@ RE:
 					go pipe(conn, s)
 				}
 
-			}()
-
+			}
 		}
+
 	}
 
 	select {}
