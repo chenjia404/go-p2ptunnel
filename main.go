@@ -87,7 +87,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 
 var d *dht.IpfsDHT
 
-func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, error) {
+func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2p_port int) (host.Host, error) {
 
 	connmgr_, _ := connmgr.NewConnManager(
 		10,  // Lowwater
@@ -100,17 +100,14 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 		libp2p.UserAgent("go-p2ptunnel"),
 
 		libp2p.ListenAddrStrings(
-			"/ip4/0.0.0.0/udp/0/quic-v1",
-			"/ip6/::/udp/0/quic-v1",
+			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", p2p_port),
+			fmt.Sprintf("/ip6/::/tcp/%d", p2p_port),
 
-			"/ip4/0.0.0.0/tcp/0",
-			"/ip6/::/tcp/0",
+			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic-v1", p2p_port),
+			fmt.Sprintf("/ip6/::/udp/%d/quic-v1", p2p_port),
 
-			"/ip4/0.0.0.0/tcp/0/ws",
-			"/ip6/::/tcp/0/ws",
-
-			"/ip4/0.0.0.0/udp/0/quic-v1/webtransport",
-			"/ip6/::/udp/0/quic-v1/webtransport",
+			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic-v1/webtransport", p2p_port),
+			fmt.Sprintf("/ip6/::/udp/%d/quic-v1/webtransport", p2p_port),
 		),
 
 		libp2p.DefaultTransports,
@@ -198,11 +195,15 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey) (host.Host, erro
 
 	}()
 
+	for _, value := range h.Addrs() {
+		fmt.Println("multiaddr:" + value.String())
+	}
+
 	return h, err
 }
 
 var (
-	version   = "0.0.3"
+	version   = "0.0.4"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -254,6 +255,7 @@ RE:
 
 	ip := flag.String("l", "127.0.0.1:10086", "forwarder to ip or listen ip")
 	id := flag.String("id", "", "Destination multiaddr id string")
+	p2p_port := flag.Int("p2p_port", 4001, "p2p use port")
 	networkType := flag.String("type", "tcp", "network type tcp/udp")
 	flag.Parse()
 
@@ -261,7 +263,7 @@ RE:
 
 	priv, _ := loadUserPrivKey()
 
-	h, err := createLibp2pHost(ctx, priv)
+	h, err := createLibp2pHost(ctx, priv, *p2p_port)
 	if err != nil {
 		cancel()
 		fmt.Printf("err", err)
@@ -275,7 +277,7 @@ RE:
 
 		h.SetStreamHandler(Protocol, func(s network.Stream) {
 
-			fmt.Println("新客户端\n")
+			log.Printf("新客户端%s\n", s.Conn().RemotePeer().String())
 			dconn, err := net.Dial(*networkType, *ip)
 			if err != nil {
 				fmt.Printf("连接%v失败:%v\n", ip, err)
@@ -290,7 +292,13 @@ RE:
 	} else {
 		//连接指定节点
 		// Turn the destination into a multiaddr.
-		maddr, err := multiaddr.NewMultiaddr(string("/ipfs/" + *id))
+		id_str := string(*id)
+		if id_str[0] != '/' {
+			id_str = "/p2p/" + id_str
+		}
+
+		maddr, err := multiaddr.NewMultiaddr(id_str)
+
 		if err != nil {
 			log.Fatalln("multiaddr", err)
 		}
