@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/chenjia404/go-p2ptunnel/pRuntime"
@@ -20,7 +21,6 @@ import (
 	"github.com/libp2p/go-libp2p/core/routing"
 	routing2 "github.com/libp2p/go-libp2p/p2p/discovery/routing"
 	"github.com/libp2p/go-libp2p/p2p/security/noise"
-	libp2ptls "github.com/libp2p/go-libp2p/p2p/security/tls"
 	"github.com/multiformats/go-multiaddr"
 
 	dht "github.com/libp2p/go-libp2p-kad-dht"
@@ -103,6 +103,9 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2p_port int) (h
 			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", p2p_port),
 			fmt.Sprintf("/ip6/::/tcp/%d", p2p_port),
 
+			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d/ws", p2p_port),
+			fmt.Sprintf("/ip6/::/tcp/%d/ws", p2p_port),
+
 			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic-v1", p2p_port),
 			fmt.Sprintf("/ip6/::/udp/%d/quic-v1", p2p_port),
 
@@ -113,11 +116,10 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2p_port int) (h
 		libp2p.DefaultTransports,
 
 		libp2p.Security(noise.ID, noise.New),
-		libp2p.Security(libp2ptls.ID, libp2ptls.New),
-
-		libp2p.NATPortMap(),
 
 		libp2p.ConnectionManager(connmgr_),
+
+		libp2p.NATPortMap(),
 
 		libp2p.EnableRelay(),
 		libp2p.EnableNATService(),
@@ -144,9 +146,25 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2p_port int) (h
 		h.Connect(ctx, *pi)
 	}
 
+	if !nodisc {
+		_, h2, err2 := nodeDiscovery(ctx, err, h)
+		if err2 != nil {
+			return h2, err2
+		}
+
+	}
+
+	for _, value := range h.Addrs() {
+		fmt.Println("multiaddr:" + value.String())
+	}
+
+	return h, err
+}
+
+func nodeDiscovery(ctx context.Context, err error, h host.Host) (error, host.Host, error) {
 	err = d.Bootstrap(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	d1 := routing2.NewRoutingDiscovery(d)
 
@@ -194,19 +212,16 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2p_port int) (h
 		}
 
 	}()
-
-	for _, value := range h.Addrs() {
-		fmt.Println("multiaddr:" + value.String())
-	}
-
-	return h, err
+	return err, nil, nil
 }
 
 var (
-	version   = "0.0.4"
+	version   = "0.0.5"
 	gitRev    = ""
 	buildTime = ""
 )
+
+var nodisc bool
 
 func main() {
 RE:
@@ -256,8 +271,11 @@ RE:
 	ip := flag.String("l", "127.0.0.1:10086", "forwarder to ip or listen ip")
 	id := flag.String("id", "", "Destination multiaddr id string")
 	p2p_port := flag.Int("p2p_port", 4001, "p2p use port")
+	flag_nodisc := flag.Bool("nodisc", false, "Turn off node discovery")
 	networkType := flag.String("type", "tcp", "network type tcp/udp")
+
 	flag.Parse()
+	nodisc = *flag_nodisc
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -271,6 +289,9 @@ RE:
 	}
 
 	fmt.Println("Your id: " + h.ID().String())
+	if nodisc {
+		fmt.Println("Turn off node discovery")
+	}
 
 	//打开隧道
 	if *id == "" {
@@ -353,14 +374,19 @@ RE:
 	select {}
 }
 func pipe(src net.Conn, dest network.Stream) {
+	var wg sync.WaitGroup
+	var wait = 5 * time.Second
 	errChan := make(chan error, 1)
 	onClose := func(err error) {
 		fmt.Println("Close")
 		_ = dest.Close()
 		_ = src.Close()
 	}
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		_, err := io.Copy(src, dest)
+		src.SetReadDeadline(time.Now().Add(wait)) // unblock read on right
 		errChan <- err
 		onClose(err)
 	}()
@@ -370,4 +396,6 @@ func pipe(src net.Conn, dest network.Stream) {
 		onClose(err)
 	}()
 	<-errChan
+	src.SetReadDeadline(time.Now().Add(wait)) // unblock read on left
+	wg.Wait()
 }
