@@ -33,7 +33,7 @@ import (
 const Protocol = "/p2ptunnel/0.1"
 
 func loadUserPrivKey() (priv crypto.PrivKey, err error) {
-	krPath := "./user.key"
+	krPath := user + ".key"
 	pkFile, err := os.Open(krPath)
 
 	if err == nil {
@@ -222,6 +222,7 @@ var (
 )
 
 var nodisc bool
+var user = "user"
 
 func main() {
 RE:
@@ -272,10 +273,14 @@ RE:
 	id := flag.String("id", "", "Destination multiaddr id string")
 	p2p_port := flag.Int("p2p_port", 4001, "p2p use port")
 	flag_nodisc := flag.Bool("nodisc", false, "Turn off node discovery")
+	flag_user := flag.String("user", "user", "Turn off node discovery")
 	networkType := flag.String("type", "tcp", "network type tcp/udp")
 
 	flag.Parse()
 	nodisc = *flag_nodisc
+	if len(*flag_user) > 0 {
+		user = *flag_user
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 
