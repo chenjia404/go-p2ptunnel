@@ -17,7 +17,11 @@
 | user    | 字符串          | 指定使用本地的哪一个key文件                                                        |
 | update  | bool          | 从GitHub更新最新版，会验证升级包签名、sha512                                           |
 
+### 升级
 
+`./go-p2ptunnel -update`
+
+v0.0.6 以后，程序会自动从GitHub更新最新版版本，会验证文件的sha512和gpg签名，gpg签名id为 `189BE79683369DA3`
 
 ### id格式(multiaddr)
 |  类型 | 样例|说明  |
@@ -49,8 +53,6 @@
 
 `goreleaser release --skip-publish  --rm-dist`
 
-
-`gpg --armor --detach-sign dist/checksums.txt`
 
 ### 服务发布和分享(todo)
 
