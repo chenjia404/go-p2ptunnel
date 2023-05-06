@@ -14,6 +14,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chenjia404/go-p2ptunnel/update"
+
 	"github.com/chenjia404/go-p2ptunnel/pRuntime"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/network"
@@ -216,7 +218,7 @@ func nodeDiscovery(ctx context.Context, err error, h host.Host) (error, host.Hos
 }
 
 var (
-	version   = "0.0.5"
+	version   = "0.0.6"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -225,6 +227,21 @@ var nodisc bool
 var user = "user"
 
 func main() {
+
+	ip := flag.String("l", "127.0.0.1:10086", "forwarder to ip or listen ip")
+	id := flag.String("id", "", "Destination multiaddr id string")
+	p2p_port := flag.Int("p2p_port", 4001, "p2p use port")
+	flag_nodisc := flag.Bool("nodisc", false, "Turn off node discovery")
+	flag_user := flag.String("user", "user", "Turn off node discovery")
+	networkType := flag.String("type", "tcp", "network type tcp/udp")
+	flag_update := flag.Bool("update", false, "update form github")
+
+	flag.Parse()
+
+	if *flag_update {
+		update.ChcckGithubVersion(version)
+		return
+	}
 RE:
 	proc, err := pRuntime.NewProc()
 	if err != nil {
@@ -269,14 +286,6 @@ RE:
 	fmt.Printf("System version: %s\n", runtime.GOARCH+"/"+runtime.GOOS)
 	fmt.Printf("Golang version: %s\n", runtime.Version())
 
-	ip := flag.String("l", "127.0.0.1:10086", "forwarder to ip or listen ip")
-	id := flag.String("id", "", "Destination multiaddr id string")
-	p2p_port := flag.Int("p2p_port", 4001, "p2p use port")
-	flag_nodisc := flag.Bool("nodisc", false, "Turn off node discovery")
-	flag_user := flag.String("user", "user", "Turn off node discovery")
-	networkType := flag.String("type", "tcp", "network type tcp/udp")
-
-	flag.Parse()
 	nodisc = *flag_nodisc
 	if len(*flag_user) > 0 {
 		user = *flag_user
