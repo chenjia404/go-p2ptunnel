@@ -3,7 +3,7 @@ module github.com/chenjia404/go-p2ptunnel
 go 1.20
 
 require (
-	github.com/libp2p/go-libp2p v0.27.2
+	github.com/libp2p/go-libp2p v0.27.3
 	github.com/libp2p/go-libp2p-kad-dht v0.23.0
 	github.com/multiformats/go-multiaddr v0.9.0
 	github.com/polydawn/refmt v0.89.0
