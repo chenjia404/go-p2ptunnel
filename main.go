@@ -315,7 +315,7 @@ RE:
 			for { // 用上一个死循环，不停地执行，否则只会执行一次
 				select {
 				case <-ticker.C:
-					log.Printf("Stream:%d\n", len(h.Network().Conns()))
+					log.Printf("Conns:%d\n", len(h.Network().Conns()))
 				}
 			}
 		}()
