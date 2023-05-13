@@ -89,11 +89,11 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 
 var d *dht.IpfsDHT
 
-func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2p_port int) (host.Host, error) {
+func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, maxPeers int) (host.Host, error) {
 
 	connmgr_, _ := connmgr.NewConnManager(
-		10,  // Lowwater
-		500, // HighWater,
+		10,       // Lowwater
+		maxPeers, // HighWater,
 		connmgr.WithGracePeriod(time.Minute),
 	)
 
@@ -102,17 +102,17 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2p_port int) (h
 		libp2p.UserAgent("go-p2ptunnel"),
 
 		libp2p.ListenAddrStrings(
-			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", p2p_port),
-			fmt.Sprintf("/ip6/::/tcp/%d", p2p_port),
+			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", p2pPort),
+			fmt.Sprintf("/ip6/::/tcp/%d", p2pPort),
 
-			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d/ws", p2p_port),
-			fmt.Sprintf("/ip6/::/tcp/%d/ws", p2p_port),
+			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d/ws", p2pPort),
+			fmt.Sprintf("/ip6/::/tcp/%d/ws", p2pPort),
 
-			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic-v1", p2p_port),
-			fmt.Sprintf("/ip6/::/udp/%d/quic-v1", p2p_port),
+			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic-v1", p2pPort),
+			fmt.Sprintf("/ip6/::/udp/%d/quic-v1", p2pPort),
 
-			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic-v1/webtransport", p2p_port),
-			fmt.Sprintf("/ip6/::/udp/%d/quic-v1/webtransport", p2p_port),
+			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic-v1/webtransport", p2pPort),
+			fmt.Sprintf("/ip6/::/udp/%d/quic-v1/webtransport", p2pPort),
 		),
 
 		libp2p.DefaultTransports,
@@ -234,6 +234,7 @@ func main() {
 	ip := flag.String("l", "127.0.0.1:10086", "forwarder to ip or listen ip")
 	id := flag.String("id", "", "Destination multiaddr id string")
 	p2p_port := flag.Int("p2p_port", 4001, "p2p use port")
+	max_peers := flag.Int("max_peers", 500, "Maximum number of connections, default 500")
 	flag_nodisc := flag.Bool("nodisc", false, "Turn off node discovery")
 	flag_user := flag.String("user", "user", "Turn off node discovery")
 	networkType := flag.String("type", "tcp", "network type tcp/udp")
@@ -298,7 +299,7 @@ RE:
 
 	priv, _ := loadUserPrivKey()
 
-	h, err := createLibp2pHost(ctx, priv, *p2p_port)
+	h, err := createLibp2pHost(ctx, priv, *p2p_port, *max_peers)
 	if err != nil {
 		cancel()
 		fmt.Printf("err", err)
@@ -387,7 +388,7 @@ RE:
 			err = h.Connect(ctx, *info)
 			if err != nil {
 				log.Println("Connect:", err)
-				time.Sleep(time.Second * 10)
+				time.Sleep(time.Second * 5)
 			} else {
 				fmt.Printf("连接成功%s\n", info.ID.String())
 				for {
@@ -398,7 +399,7 @@ RE:
 							err = h.Connect(ctx, *info)
 							if err != nil {
 								log.Println("Connect:", err)
-								time.Sleep(time.Second * 10)
+								time.Sleep(time.Second * 5)
 							}
 						}
 					}
@@ -413,6 +414,11 @@ RE:
 						}
 					} else {
 						log.Println("New Stream is open")
+					}
+
+					// 长时间休眠，已经没有 Stream 了
+					if len(s.Conn().GetStreams()) == 0 {
+						continue
 					}
 					conn, err := lis.Accept()
 					if err != nil {
