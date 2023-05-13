@@ -239,7 +239,7 @@ func main() {
 	flag.Parse()
 
 	if *flag_update {
-		update.ChcckGithubVersion(version)
+		update.CheckGithubVersion(version)
 		return
 	}
 RE:

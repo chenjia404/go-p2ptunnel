@@ -22,7 +22,7 @@ import (
 	"golang.org/x/crypto/openpgp"
 )
 
-func ChcckGithubVersion(Version string) {
+func CheckGithubVersion(Version string) {
 	githubName := "go-p2ptunnel"
 	githubPath := "chenjia404/go-p2ptunnel"
 
@@ -64,7 +64,7 @@ func ChcckGithubVersion(Version string) {
 	resp, err := http.Get(updateFileUrl)
 
 	if resp.StatusCode == 404 {
-		fmt.Println("文件不存在，404错误")
+		fmt.Println("文件不存在，404错误" + updateFileUrl)
 		return
 	}
 	if err != nil {
