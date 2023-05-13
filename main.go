@@ -329,7 +329,7 @@ RE:
 				return
 			} else {
 				fmt.Printf("转发:%s\n", *ip)
-				fmt.Printf("Conns:%d\n", len(h.Network().Conns()))
+				fmt.Printf("Streams:%d\n", len(s.Conn().GetStreams()))
 
 			}
 			go pipe(dconn, s)
