@@ -218,7 +218,7 @@ func nodeDiscovery(ctx context.Context, err error, h host.Host) (error, host.Hos
 }
 
 var (
-	version   = "0.0.8"
+	version   = "0.0.9"
 	gitRev    = ""
 	buildTime = ""
 )
