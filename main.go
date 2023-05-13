@@ -439,26 +439,20 @@ RE:
 }
 func pipe(src net.Conn, dest network.Stream) {
 	var wg sync.WaitGroup
-	var wait = 10 * time.Second
-	errChan := make(chan error, 1)
 	onClose := func(err error) {
-		_ = dest.Close()
+		_ = dest.Reset()
 		_ = src.Close()
 	}
-	wg.Add(1)
+	wg.Add(2)
 	go func() {
 		defer wg.Done()
 		_, err := io.Copy(src, dest)
-		dest.SetReadDeadline(time.Now().Add(wait)) // unblock read on right
-		errChan <- err
 		onClose(err)
 	}()
 	go func() {
+		defer wg.Done()
 		_, err := io.Copy(dest, src)
-		errChan <- err
 		onClose(err)
 	}()
-	<-errChan
-	src.SetReadDeadline(time.Now().Add(wait)) // unblock read on left
 	wg.Wait()
 }
