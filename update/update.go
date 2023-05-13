@@ -62,16 +62,14 @@ func CheckGithubVersion(Version string) {
 	updateFileUrl := fmt.Sprintf("https://github.com/%s/releases/download/v%s/%s_%s_%s_%s.%s", githubPath, githubVerion, githubName, githubVerion, runtime.GOOS, runtime.GOARCH, archivesFormat)
 	// Get the data
 	resp, err := http.Get(updateFileUrl)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	if resp.StatusCode == 404 {
 		fmt.Println("文件不存在，404错误" + updateFileUrl)
 		return
-	}
-	if err != nil {
-		fmt.Println(err)
-		return
-	} else {
-		fmt.Println("下载最新安装包成功")
 	}
 	defer resp.Body.Close()
 
@@ -87,6 +85,8 @@ func CheckGithubVersion(Version string) {
 	if err != nil {
 		fmt.Println(err)
 		return
+	} else {
+		fmt.Println("下载最新安装包成功")
 	}
 
 	h := sha512.New()
@@ -107,7 +107,7 @@ func CheckGithubVersion(Version string) {
 	checksums := string(b)
 	if strings.Index(checksums, fileSha512) < 0 {
 
-		fmt.Println("文件sha512错误")
+		fmt.Println("文件sha512错误" + fileSha512)
 		return
 	}
 
