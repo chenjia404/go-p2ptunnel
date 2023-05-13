@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/libp2p/go-libp2p/core/routing"
 	"io"
 	"io/ioutil"
 	"log"
@@ -20,7 +21,6 @@ import (
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peerstore"
-	"github.com/libp2p/go-libp2p/core/routing"
 	routing2 "github.com/libp2p/go-libp2p/p2p/discovery/routing"
 	"github.com/libp2p/go-libp2p/p2p/security/noise"
 	"github.com/multiformats/go-multiaddr"
@@ -93,7 +93,7 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2p_port int) (h
 
 	connmgr_, _ := connmgr.NewConnManager(
 		10,  // Lowwater
-		200, // HighWater,
+		500, // HighWater,
 		connmgr.WithGracePeriod(time.Minute),
 	)
 
@@ -130,9 +130,12 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2p_port int) (h
 		libp2p.DefaultPeerstore,
 
 		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
-			var err error
-			d, err = dht.New(ctx, h, dht.BootstrapPeers(dht.GetDefaultBootstrapPeerAddrInfos()...))
-			return d, err
+			if !nodisc {
+				var err error
+				d, err = dht.New(ctx, h, dht.BootstrapPeers(dht.GetDefaultBootstrapPeerAddrInfos()...))
+				return d, err
+			}
+			return nil, nil
 		}),
 	)
 	if err != nil {
