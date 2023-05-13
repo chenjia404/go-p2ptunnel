@@ -19,7 +19,9 @@ The node private key file is in the current directory, the suffix of the file na
 | user | string | specify which local key file to use |
 | update | bool | Update the latest version from GitHub, it will verify the upgrade package signature, sha512 |
 
+### build
 
+` go build -trimpath -ldflags="-w -s" `
 
 ### upgrade
 

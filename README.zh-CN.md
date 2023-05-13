@@ -18,6 +18,10 @@
 | user    | 字符串          | 指定使用本地的哪一个key文件                                                        |
 | update  | bool          | 从GitHub更新最新版，会验证升级包签名、sha512                                           |
 
+### 编译
+
+` go build -trimpath -ldflags="-w -s" `
+
 ### 升级
 
 `./go-p2ptunnel -update`
