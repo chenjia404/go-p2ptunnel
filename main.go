@@ -218,7 +218,7 @@ func nodeDiscovery(ctx context.Context, err error, h host.Host) (error, host.Hos
 }
 
 var (
-	version   = "0.0.7"
+	version   = "0.0.8"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -311,7 +311,6 @@ RE:
 	if *id == "" {
 
 		h.SetStreamHandler(Protocol, func(s network.Stream) {
-
 			log.Printf("新客户端%s\n", s.Conn().RemotePeer().String())
 			dconn, err := net.Dial(*networkType, *ip)
 			if err != nil {
@@ -320,6 +319,8 @@ RE:
 				return
 			} else {
 				fmt.Printf("转发:%s\n", *ip)
+				fmt.Printf("Conns:%d\n", len(h.Network().Conns()))
+
 			}
 			go pipe(dconn, s)
 		})
@@ -346,7 +347,8 @@ RE:
 
 		// Add the destination's peer multiaddress in the peerstore.
 		// This will be used during connection and stream creation by libp2p.
-		time.Sleep(time.Second * 5)
+		//time.Sleep(time.Second * 5)
+		var s network.Stream
 		for {
 			h.Peerstore().AddAddrs(info.ID, info.Addrs, peerstore.PermanentAddrTTL)
 			err = h.Connect(ctx, *info)
@@ -365,10 +367,17 @@ RE:
 				}
 
 				for {
-					s, err := h.NewStream(ctx, info.ID, Protocol)
+					if s != nil {
+
+						log.Printf("Stream:%d\n", len(s.Conn().GetStreams()))
+					}
+					log.Println("open New Stream")
+					s, err = h.NewStream(ctx, info.ID, Protocol)
 					if err != nil {
-						fmt.Println(err)
-						continue
+						fmt.Println("New Stream:" + err.Error())
+						break
+					} else {
+						log.Println("New Stream is open")
 					}
 					conn, err := lis.Accept()
 					if err != nil {
@@ -389,10 +398,9 @@ RE:
 }
 func pipe(src net.Conn, dest network.Stream) {
 	var wg sync.WaitGroup
-	var wait = 5 * time.Second
+	var wait = 10 * time.Second
 	errChan := make(chan error, 1)
 	onClose := func(err error) {
-		fmt.Println("Close")
 		_ = dest.Close()
 		_ = src.Close()
 	}
