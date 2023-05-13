@@ -310,6 +310,16 @@ RE:
 	//打开隧道
 	if *id == "" {
 
+		ticker := time.NewTicker(time.Second * 10)
+		go func() {
+			for { // 用上一个死循环，不停地执行，否则只会执行一次
+				select {
+				case <-ticker.C:
+					log.Printf("Stream:%d\n", len(h.Network().Conns()))
+				}
+			}
+		}()
+
 		h.SetStreamHandler(Protocol, func(s network.Stream) {
 			log.Printf("新客户端%s\n", s.Conn().RemotePeer().String())
 			dconn, err := net.Dial(*networkType, *ip)
@@ -349,6 +359,26 @@ RE:
 		// This will be used during connection and stream creation by libp2p.
 		//time.Sleep(time.Second * 5)
 		var s network.Stream
+		ticker := time.NewTicker(time.Second * 10)
+		go func() {
+			for { // 用上一个死循环，不停地执行，否则只会执行一次
+				select {
+				case <-ticker.C:
+					if s != nil {
+						log.Printf("Stream:%d\n", len(s.Conn().GetStreams()))
+					}
+				}
+			}
+		}()
+
+		lis, err := net.Listen(*networkType, *ip)
+		if err != nil {
+			fmt.Println("Listen:", err)
+			return
+		} else {
+			fmt.Printf("监听:%s\n", *ip)
+		}
+
 		for {
 			h.Peerstore().AddAddrs(info.ID, info.Addrs, peerstore.PermanentAddrTTL)
 			err = h.Connect(ctx, *info)
@@ -357,31 +387,33 @@ RE:
 				time.Sleep(time.Second * 10)
 			} else {
 				fmt.Printf("连接成功%s\n", info.ID.String())
-
-				lis, err := net.Listen(*networkType, *ip)
-				if err != nil {
-					fmt.Println("Listen:", err)
-					return
-				} else {
-					fmt.Printf("监听:%s\n", *ip)
-				}
-
 				for {
 					if s != nil {
 
 						log.Printf("Stream:%d\n", len(s.Conn().GetStreams()))
+						if len(s.Conn().GetStreams()) == 0 {
+							err = h.Connect(ctx, *info)
+							if err != nil {
+								log.Println("Connect:", err)
+								time.Sleep(time.Second * 10)
+							}
+						}
 					}
 					log.Println("open New Stream")
 					s, err = h.NewStream(ctx, info.ID, Protocol)
 					if err != nil {
 						fmt.Println("New Stream:" + err.Error())
-						break
+						err = h.Connect(ctx, *info)
+						if err != nil {
+							log.Println("Connect:", err)
+							time.Sleep(time.Second * 10)
+						}
 					} else {
 						log.Println("New Stream is open")
 					}
 					conn, err := lis.Accept()
 					if err != nil {
-						fmt.Println("建立连接错误:%v\n", err)
+						fmt.Printf("建立连接错误:%s\n", err.Error())
 					} else {
 						fmt.Println("新请求")
 					}
@@ -408,7 +440,7 @@ func pipe(src net.Conn, dest network.Stream) {
 	go func() {
 		defer wg.Done()
 		_, err := io.Copy(src, dest)
-		src.SetReadDeadline(time.Now().Add(wait)) // unblock read on right
+		dest.SetReadDeadline(time.Now().Add(wait)) // unblock read on right
 		errChan <- err
 		onClose(err)
 	}()
