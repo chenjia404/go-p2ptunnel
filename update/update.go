@@ -59,7 +59,7 @@ func CheckGithubVersion(Version string) {
 		fmt.Println("更新时间不足1个小时，延迟更新")
 		return
 	}
-	updateFileUrl := fmt.Sprintf("https://github.com/%s/releases/download/v%s/%s-%s-%s-%s.%s", githubPath, githubVerion, githubName, githubVerion, runtime.GOOS, runtime.GOARCH, archivesFormat)
+	updateFileUrl := fmt.Sprintf("https://github.com/%s/releases/download/v%s/%s_%s_%s_%s.%s", githubPath, githubVerion, githubName, githubVerion, runtime.GOOS, runtime.GOARCH, archivesFormat)
 	// Get the data
 	resp, err := http.Get(updateFileUrl)
 
