@@ -1,0 +1,10 @@
+net:
+  listen: 127.0.0.1:10086
+  id: 12D3KooWLHjy7DM6omRpgBsU2Bpi2UcywDN8FwX9UNwnzEsZep1C
+  p2p_port: 4001
+  max_peers: 500
+  no_disc: false
+
+key:
+  user: user  #当前使用的key id
+  store: ./   #存储目录

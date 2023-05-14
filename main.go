@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
+	"github.com/chenjia404/go-p2ptunnel/config"
 	"github.com/libp2p/go-libp2p/core/routing"
 	"github.com/libp2p/go-libp2p/p2p/host/autorelay"
 	"io"
@@ -232,7 +232,7 @@ func nodeDiscovery(ctx context.Context, err error, h host.Host) (error, host.Hos
 }
 
 var (
-	version   = "0.0.10"
+	version   = "0.0.11"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -242,18 +242,20 @@ var user = "user"
 
 func main() {
 
-	ip := flag.String("l", "127.0.0.1:10086", "forwarder to ip or listen ip")
-	id := flag.String("id", "", "Destination multiaddr id string")
-	p2p_port := flag.Int("p2p_port", 4001, "p2p use port")
-	max_peers := flag.Int("max_peers", 500, "Maximum number of connections, default 500")
-	flag_nodisc := flag.Bool("nodisc", false, "Turn off node discovery")
-	flag_user := flag.String("user", "user", "Turn off node discovery")
-	networkType := flag.String("type", "tcp", "network type tcp/udp")
-	flag_update := flag.Bool("update", false, "update form github")
+	//ip := flag.String("l", "127.0.0.1:10086", "forwarder to ip or listen ip")
+	//id := flag.String("id", "", "Destination multiaddr id string")
+	//p2p_port := flag.Int("p2p_port", 4001, "p2p use port")
+	//max_peers := flag.Int("max_peers", 500, "Maximum number of connections, default 500")
+	//flag_nodisc := flag.Bool("nodisc", false, "Turn off node discovery")
+	//flag_user := flag.String("user", "user", "Turn off node discovery")
+	//networkType := flag.String("type", "tcp", "network type tcp/udp")
+	//flag_update := flag.Bool("update", false, "update form github")
+	//
+	//flag.Parse()
 
-	flag.Parse()
+	config.LoadConfig()
 
-	if *flag_update {
+	if config.Cfg.Update {
 		update.CheckGithubVersion(version)
 		return
 	}
@@ -301,16 +303,15 @@ RE:
 	fmt.Printf("System version: %s\n", runtime.GOARCH+"/"+runtime.GOOS)
 	fmt.Printf("Golang version: %s\n", runtime.Version())
 
-	nodisc = *flag_nodisc
-	if len(*flag_user) > 0 {
-		user = *flag_user
+	if len(config.Cfg.User) > 0 {
+		user = config.Cfg.User
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 
 	priv, _ := loadUserPrivKey()
 
-	h, err := createLibp2pHost(ctx, priv, *p2p_port, *max_peers)
+	h, err := createLibp2pHost(ctx, priv, config.Cfg.P2pPort, config.Cfg.MaxPeers)
 	if err != nil {
 		cancel()
 		fmt.Printf("err", err)
@@ -323,7 +324,7 @@ RE:
 	}
 
 	//打开隧道
-	if *id == "" {
+	if config.Cfg.Id == "" {
 
 		ticker := time.NewTicker(time.Second * 10)
 		go func() {
@@ -337,13 +338,13 @@ RE:
 
 		h.SetStreamHandler(Protocol, func(s network.Stream) {
 			log.Printf("新客户端%s\n", s.Conn().RemotePeer().String())
-			dconn, err := net.Dial(*networkType, *ip)
+			dconn, err := net.Dial("tcp", config.Cfg.Listen)
 			if err != nil {
-				fmt.Printf("连接%v失败:%v\n", ip, err)
+				fmt.Printf("连接%v失败:%v\n", config.Cfg.Listen, err)
 				s.Close()
 				return
 			} else {
-				fmt.Printf("转发:%s\n", *ip)
+				fmt.Printf("转发:%s\n", config.Cfg.Listen)
 				fmt.Printf("Streams:%d\n", len(s.Conn().GetStreams()))
 
 			}
@@ -353,7 +354,7 @@ RE:
 	} else {
 		//连接指定节点
 		// Turn the destination into a multiaddr.
-		id_str := string(*id)
+		id_str := config.Cfg.Id
 		if id_str[0] != '/' {
 			id_str = "/p2p/" + id_str
 		}
@@ -386,12 +387,12 @@ RE:
 			}
 		}()
 
-		lis, err := net.Listen(*networkType, *ip)
+		lis, err := net.Listen("tcp", config.Cfg.Listen)
 		if err != nil {
 			fmt.Println("Listen:", err)
 			return
 		} else {
-			fmt.Printf("监听:%s\n", *ip)
+			fmt.Printf("监听:%s\n", config.Cfg.Listen)
 		}
 
 		for {
