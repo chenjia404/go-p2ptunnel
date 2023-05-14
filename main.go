@@ -102,6 +102,11 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, max
 	r, _ := peer.AddrInfoFromString("/ip4/74.207.234.100/tcp/4001/p2p/12D3KooWHLkRaMVujS34CQtGyrDAjBYSertSzmxjL1gaRejYzb3j")
 	staticRelays = append(staticRelays, *r)
 
+	wsPort := p2pPort + 1
+	if p2pPort == 0 {
+		wsPort = 0
+	}
+
 	h, err := libp2p.New(
 		libp2p.Identity(priv),
 		libp2p.UserAgent("go-p2ptunnel"),
@@ -110,8 +115,8 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, max
 			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", p2pPort),
 			fmt.Sprintf("/ip6/::/tcp/%d", p2pPort),
 
-			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d/ws", p2pPort+1),
-			fmt.Sprintf("/ip6/::/tcp/%d/ws", p2pPort+1),
+			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d/ws", wsPort),
+			fmt.Sprintf("/ip6/::/tcp/%d/ws", wsPort),
 
 			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic-v1", p2pPort),
 			fmt.Sprintf("/ip6/::/udp/%d/quic-v1", p2pPort),

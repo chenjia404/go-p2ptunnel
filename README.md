@@ -10,15 +10,15 @@ The node private key file is in the current directory, the suffix of the file na
 
 ### Parameter Description
 
-| Field     | Type             | Description |
-|-----------|------------------|---------------------------------------------------------------------------|
+| Field     | Type             | Description                                                                                                                                                                             |
+|-----------|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | l         | Address          | The listening or forwarding address. If the id is not set, the address is forwarded. If it is set, the remote port is mapped to the local address. The default value is 127.0.0.1:10086 |
-| id        | multiaddr format | connection remote service id |
-| p2p_port  | ip port          | The port used by p2p is also the port that listens for other nodes to connect. The default is 4001, and it will automatically perform nat, but you may need to perform port mapping |
-| nodisc    | bool             | Prohibit broadcasting to improve performance, connecting nodes must use links with ip and port |
-| user      | string           | specify which local key file to use |
-| update    | bool             | Update the latest version from GitHub, it will verify the upgrade package signature, sha512 |
-| max_peers | int              | Maximum number of connections, default 500 |
+| id        | multiaddr format | connection remote service id                                                                                                                                                            |
+| p2p_port  | ip port          | The port used by p2p is also the port that listens for other nodes to connect. The default is 4001, and it will automatically perform nat, but you may need to perform port mapping.If 0, a random port will be chosen    |
+| nodisc    | bool             | Prohibit broadcasting to improve performance, connecting nodes must use links with ip and port                                                                                          |
+| user      | string           | specify which local key file to use                                                                                                                                                     |
+| update    | bool             | Update the latest version from GitHub, it will verify the upgrade package signature, sha512                                                                                             |
+| max_peers | int              | Maximum number of connections, default 500                                                                                                                                              |
 
 ### build
 
