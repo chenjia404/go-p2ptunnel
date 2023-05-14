@@ -89,6 +89,10 @@ func CheckGithubVersion(Version string) {
 		fmt.Println("下载最新安装包成功")
 	}
 
+	out, err = os.Open("update.zip")
+	if err != nil {
+		fmt.Println(err)
+	}
 	h := sha512.New()
 	if _, err := io.Copy(h, out); err != nil {
 		fmt.Println(err)
@@ -111,7 +115,7 @@ func CheckGithubVersion(Version string) {
 		return
 	}
 
-	ascFileURL := fmt.Sprintf("https://github.com/%s/releases/download/v%s/%s-%s-%s-%s.%s.asc", githubPath, githubVerion, githubName, githubVerion, runtime.GOOS, runtime.GOARCH, archivesFormat)
+	ascFileURL := fmt.Sprintf("https://github.com/%s/releases/download/v%s/%s_%s_%s_%s.%s.asc", githubPath, githubVerion, githubName, githubVerion, runtime.GOOS, runtime.GOARCH, archivesFormat)
 	err = DownloadFile(ascFileURL, fmt.Sprintf("update.%s.asc", archivesFormat))
 	if err != nil {
 		fmt.Println(err)
@@ -294,8 +298,8 @@ func DownloadFile(url string, dest string) error {
 	// Get the data
 	resp, err := http.Get(url)
 
-	if resp.StatusCode != 404 {
-		fmt.Println("文件不存在，404错误")
+	if resp.StatusCode == 404 {
+		fmt.Println("文件不存在，404错误" + url)
 		return http.ErrMissingFile
 	}
 	if err != nil {
@@ -310,6 +314,15 @@ func DownloadFile(url string, dest string) error {
 		fmt.Println(err)
 	}
 	defer out.Close()
+
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	} else {
+		fmt.Println("签名文件下载成功")
+	}
+
 	return nil
 }
 
@@ -356,12 +369,12 @@ func VerifySignature(filename string) (bool, error) {
 		return false, err
 	}
 
-	verification_target, err := os.Open(filename)
+	verificationTarget, err := os.Open(filename)
 	if err != nil {
 		fmt.Println(err)
 		return false, err
 	}
-	entity, err := openpgp.CheckArmoredDetachedSignature(keyring, verification_target, signature)
+	entity, err := openpgp.CheckArmoredDetachedSignature(keyring, verificationTarget, signature)
 	if err != nil {
 		fmt.Println("Check Detached Signature: " + err.Error())
 		return false, err
