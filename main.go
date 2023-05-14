@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/libp2p/go-libp2p/core/routing"
+	"github.com/libp2p/go-libp2p/p2p/host/autorelay"
 	"io"
 	"io/ioutil"
 	"log"
@@ -96,6 +97,10 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, max
 		maxPeers, // HighWater,
 		connmgr.WithGracePeriod(time.Minute),
 	)
+	var staticRelays []peer.AddrInfo
+
+	r, _ := peer.AddrInfoFromString("/ip4/74.207.234.100/tcp/4001/p2p/12D3KooWHLkRaMVujS34CQtGyrDAjBYSertSzmxjL1gaRejYzb3j")
+	staticRelays = append(staticRelays, *r)
 
 	h, err := libp2p.New(
 		libp2p.Identity(priv),
@@ -105,8 +110,8 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, max
 			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", p2pPort),
 			fmt.Sprintf("/ip6/::/tcp/%d", p2pPort),
 
-			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d/ws", p2pPort),
-			fmt.Sprintf("/ip6/::/tcp/%d/ws", p2pPort),
+			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d/ws", p2pPort+1),
+			fmt.Sprintf("/ip6/::/tcp/%d/ws", p2pPort+1),
 
 			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic-v1", p2pPort),
 			fmt.Sprintf("/ip6/::/udp/%d/quic-v1", p2pPort),
@@ -128,6 +133,7 @@ func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, max
 		libp2p.EnableRelayService(),
 		libp2p.ForceReachabilityPublic(),
 		libp2p.DefaultPeerstore,
+		libp2p.EnableAutoRelayWithStaticRelays(staticRelays, autorelay.WithNumRelays(1)),
 
 		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
 			if !nodisc {
@@ -426,7 +432,6 @@ RE:
 					} else {
 						fmt.Println("新请求")
 					}
-
 					go pipe(conn, s)
 				}
 
