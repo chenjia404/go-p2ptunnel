@@ -416,13 +416,15 @@ RE:
 						}
 					}
 					log.Println("open New Stream")
-					s, err = h.NewStream(ctx, info.ID, Protocol)
+					timeout, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+					defer cancel()
+					s, err = h.NewStream(timeout, info.ID, Protocol)
 					if err != nil {
 						fmt.Println("New Stream:" + err.Error())
 						err = h.Connect(ctx, *info)
 						if err != nil {
 							log.Println("Connect:", err)
-							time.Sleep(time.Second * 10)
+							time.Sleep(time.Second * 5)
 						}
 					} else {
 						log.Println("New Stream is open")
