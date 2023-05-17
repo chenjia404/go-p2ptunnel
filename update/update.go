@@ -74,7 +74,7 @@ func CheckGithubVersion(Version string) {
 	defer resp.Body.Close()
 
 	// 创建一个文件用于保存
-	out, err := os.Create("update.zip")
+	out, err := os.Create("update." + archivesFormat)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -89,7 +89,7 @@ func CheckGithubVersion(Version string) {
 		fmt.Println("下载最新安装包成功")
 	}
 
-	out, err = os.Open("update.zip")
+	out, err = os.Open("update." + archivesFormat)
 	if err != nil {
 		fmt.Println(err)
 	}
