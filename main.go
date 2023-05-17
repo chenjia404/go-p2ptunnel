@@ -232,7 +232,7 @@ func nodeDiscovery(ctx context.Context, err error, h host.Host) (error, host.Hos
 }
 
 var (
-	version   = "0.0.12"
+	version   = "0.0.13"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -452,6 +452,7 @@ RE:
 }
 func pipe(src net.Conn, dest network.Stream) {
 	var wg sync.WaitGroup
+	var wait = 10 * time.Second
 	onClose := func(err error) {
 		_ = dest.Reset()
 		_ = src.Close()
@@ -460,11 +461,13 @@ func pipe(src net.Conn, dest network.Stream) {
 	go func() {
 		defer wg.Done()
 		_, err := io.Copy(src, dest)
+		src.SetReadDeadline(time.Now().Add(wait)) // unblock read on right
 		onClose(err)
 	}()
 	go func() {
 		defer wg.Done()
 		_, err := io.Copy(dest, src)
+		dest.SetReadDeadline(time.Now().Add(wait)) // unblock read on left
 		onClose(err)
 	}()
 	wg.Wait()
