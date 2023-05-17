@@ -241,18 +241,7 @@ var nodisc bool
 var user = "user"
 
 func main() {
-
-	//ip := flag.String("l", "127.0.0.1:10086", "forwarder to ip or listen ip")
-	//id := flag.String("id", "", "Destination multiaddr id string")
-	//p2p_port := flag.Int("p2p_port", 4001, "p2p use port")
-	//max_peers := flag.Int("max_peers", 500, "Maximum number of connections, default 500")
-	//flag_nodisc := flag.Bool("nodisc", false, "Turn off node discovery")
-	//flag_user := flag.String("user", "user", "Turn off node discovery")
-	//networkType := flag.String("type", "tcp", "network type tcp/udp")
-	//flag_update := flag.Bool("update", false, "update form github")
-	//
-	//flag.Parse()
-
+	
 	config.LoadConfig()
 
 	if config.Cfg.Update {
