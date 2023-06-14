@@ -3,9 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/chenjia404/go-p2ptunnel/config"
-	"github.com/libp2p/go-libp2p/core/routing"
-	"github.com/libp2p/go-libp2p/p2p/host/autorelay"
 	"io"
 	"io/ioutil"
 	"log"
@@ -16,21 +13,18 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chenjia404/go-p2ptunnel/config"
+	"github.com/chenjia404/go-p2ptunnel/p2p"
+
 	"github.com/chenjia404/go-p2ptunnel/update"
 
 	"github.com/chenjia404/go-p2ptunnel/pRuntime"
-	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peerstore"
-	routing2 "github.com/libp2p/go-libp2p/p2p/discovery/routing"
-	"github.com/libp2p/go-libp2p/p2p/security/noise"
 	"github.com/multiformats/go-multiaddr"
 
-	dht "github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/libp2p/go-libp2p/core/crypto"
-	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
-	"github.com/libp2p/go-libp2p/p2p/net/connmgr"
 )
 
 const Protocol = "/p2ptunnel/0.1"
@@ -88,151 +82,8 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 	return priv, nil
 }
 
-var d *dht.IpfsDHT
-
-func createLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, maxPeers int) (host.Host, error) {
-
-	connmgr_, _ := connmgr.NewConnManager(
-		10,       // Lowwater
-		maxPeers, // HighWater,
-		connmgr.WithGracePeriod(time.Minute),
-	)
-	var staticRelays []peer.AddrInfo
-
-	r, _ := peer.AddrInfoFromString("/ip4/74.207.234.100/tcp/4001/p2p/12D3KooWHLkRaMVujS34CQtGyrDAjBYSertSzmxjL1gaRejYzb3j")
-	staticRelays = append(staticRelays, *r)
-
-	wsPort := p2pPort + 1
-	if p2pPort == 0 {
-		wsPort = 0
-	}
-
-	h, err := libp2p.New(
-		libp2p.Identity(priv),
-		libp2p.UserAgent("go-p2ptunnel"),
-
-		libp2p.ListenAddrStrings(
-			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", p2pPort),
-			fmt.Sprintf("/ip6/::/tcp/%d", p2pPort),
-
-			fmt.Sprintf("/ip4/0.0.0.0/tcp/%d/ws", wsPort),
-			fmt.Sprintf("/ip6/::/tcp/%d/ws", wsPort),
-
-			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic-v1", p2pPort),
-			fmt.Sprintf("/ip6/::/udp/%d/quic-v1", p2pPort),
-
-			fmt.Sprintf("/ip4/0.0.0.0/udp/%d/quic-v1/webtransport", p2pPort),
-			fmt.Sprintf("/ip6/::/udp/%d/quic-v1/webtransport", p2pPort),
-		),
-
-		libp2p.DefaultTransports,
-
-		libp2p.Security(noise.ID, noise.New),
-
-		libp2p.ConnectionManager(connmgr_),
-
-		libp2p.NATPortMap(),
-
-		libp2p.EnableRelay(),
-		libp2p.EnableNATService(),
-		libp2p.EnableRelayService(),
-		libp2p.ForceReachabilityPublic(),
-		libp2p.DefaultPeerstore,
-		libp2p.EnableAutoRelayWithStaticRelays(staticRelays, autorelay.WithNumRelays(1)),
-
-		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
-			if !nodisc {
-				var err error
-				d, err = dht.New(ctx, h, dht.BootstrapPeers(dht.GetDefaultBootstrapPeerAddrInfos()...))
-				return d, err
-			}
-			return nil, nil
-		}),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	// This connects to public bootstrappers
-	for _, addr := range dht.DefaultBootstrapPeers {
-		pi, err := peer.AddrInfoFromP2pAddr(addr)
-		if err != nil {
-			panic(err)
-		}
-		h.Connect(ctx, *pi)
-	}
-
-	if !nodisc {
-		_, h2, err2 := nodeDiscovery(ctx, err, h)
-		if err2 != nil {
-			return h2, err2
-		}
-
-	}
-
-	for _, value := range h.Addrs() {
-		fmt.Println("multiaddr:" + value.String())
-	}
-
-	return h, err
-}
-
-func nodeDiscovery(ctx context.Context, err error, h host.Host) (error, host.Host, error) {
-	err = d.Bootstrap(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-	d1 := routing2.NewRoutingDiscovery(d)
-
-	go func() {
-		_, err = d1.Advertise(ctx, Protocol)
-		if err != nil {
-			log.Println(err)
-		}
-	}()
-
-	go func() {
-
-		for i := 0; i < 10; {
-			// log.Println("开始寻找节点")
-			_, err = d1.Advertise(ctx, Protocol)
-
-			if err != nil {
-				log.Println(err)
-			}
-
-			peerChan, err := d1.FindPeers(ctx, Protocol)
-			if err != nil {
-				log.Println(err)
-			}
-
-			for peer := range peerChan {
-				if peer.ID == h.ID() {
-					//log.Println("过滤自己")
-					continue
-				}
-
-				if h.Network().Connectedness(peer.ID) != network.Connected {
-					//log.Println("尝试连接:", peer)
-					err = h.Connect(ctx, peer)
-					if err == nil {
-						// log.Println("连接成功", peer.ID)
-						// fmt.Printf("当前连接节点数%d\n", len(h.Network().Peers()))
-						i++
-					} else {
-						//log.Println(err)
-					}
-				}
-
-			}
-		}
-
-	}()
-	return err, nil, nil
-}
-
 var (
-	version   = "0.0.13"
+	version   = "0.0.14"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -241,7 +92,7 @@ var nodisc bool
 var user = "user"
 
 func main() {
-	
+
 	config.LoadConfig()
 
 	if config.Cfg.Update {
@@ -300,7 +151,7 @@ RE:
 
 	priv, _ := loadUserPrivKey()
 
-	h, err := createLibp2pHost(ctx, priv, config.Cfg.P2pPort, config.Cfg.MaxPeers)
+	h, err := p2p.CreateLibp2pHost(ctx, priv, config.Cfg.P2pPort, config.Cfg.MaxPeers, config.Cfg.Nodisc, Protocol)
 	if err != nil {
 		cancel()
 		fmt.Printf("err", err)
