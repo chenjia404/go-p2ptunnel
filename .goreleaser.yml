@@ -33,7 +33,7 @@ builds:
       - ./dontoptimizeme=-N
     gcflags:
       - all=-trimpath={{.Env.GOPATH}}
-    hooks: ../sign.bat
+    hooks: ./sign.bat
 
 
 archives:
