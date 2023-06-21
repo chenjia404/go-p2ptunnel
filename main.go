@@ -83,7 +83,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 }
 
 var (
-	version   = "0.0.14"
+	version   = "0.0.15"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -256,8 +256,8 @@ RE:
 						}
 					}
 					log.Println("open New Stream")
-					timeout, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-					defer cancel()
+					timeout, _ := context.WithTimeout(context.Background(), 5*time.Second)
+
 					s, err = h.NewStream(timeout, info.ID, Protocol)
 					if err != nil {
 						fmt.Println("New Stream:" + err.Error())
@@ -271,7 +271,7 @@ RE:
 					}
 
 					// 长时间休眠，已经没有 Stream 了
-					if len(s.Conn().GetStreams()) == 0 {
+					if s == nil || len(s.Conn().GetStreams()) == 0 {
 						continue
 					}
 					conn, err := lis.Accept()
