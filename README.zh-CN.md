@@ -1,7 +1,7 @@
 [English](./README.md) | [简体中文](./README.zh-CN.md) 
 ## go-p2ptunnel
 
-使用libp2p建立tcp隧道(不支持udp)，底层传输可以使用quic、tcp、package websocket、webtransport实现，使用 noise 协议加密传输，自带nat，可以多层组合使用。
+使用libp2p建立tcp隧道(不支持udp)，底层传输可以使用quic、tcp、websocket、webtransport实现，使用 noise 协议加密传输，自带nat，可以多层组合使用。
 
 如果在没有公网ip的情况下，可以使用节点id进行连接，如果有情况的直接指定ip和通讯协议进行连接。
 
@@ -22,6 +22,10 @@
 ### 流量特征
 
 如果没有关闭节点广播(-nodisc)，节点会和大量节点进行通信，就如同一个普通的p2p程序，一天时间可能会和几千个ip通信，但是每个ip使用的流量在几十kb到几百kb左右。
+
+### 使用案例
+
+如果你的的公司或者学校网络限制了一些网站使用，那么你搭建一个隧道，连接到服务器就可以无限制的使用了。在公司网管来看，你只是使用了一个普通的p2p程序，而且连接了多个ip。
 
 ### 编译
 
