@@ -29,6 +29,12 @@
 
 和服务器连接的过程，你可以使用quic、tcp、websocket、webtransport这几种协议的任意一种，根据你的网络情况来选择。在连接id构建上，如果只是服务器节点id，就不固定使用的网络连接方式，如果用 tcp 的连接地址就会使用 tcp 链接，也可以用 websocket 格式的连接地址。
 
+例如你在服务器上有一个服务，监听的127.0.0.1:38080，在服务器`./go-p2ptunnel -l 127.0.0.1:38080 -p2p_port 4001 -nodisc`，然后复制输出地址，选择其中的一个，例如 `/ip4/1.2.3.4/tcp/4002/p2p/12D3KooWJTa5peaDcNHLuzSXLt6VQ9JFyWVG5hM2NVJZjBQTUhd5`，当然你也可以直接 12D3KooWJTa5peaDcNHLuzSXLt6VQ9JFyWVG5hM2NVJZjBQTUhd5 。
+
+本地执行 `./go-p2ptunnel -id 12D3KooWJTa5peaDcNHLuzSXLt6VQ9JFyWVG5hM2NVJZjBQTUhd5 -l 127.0.0.1:10089`，然后你本地连接这个端口就可以使用这个服务器。
+
+服务器的服务可以是一个数据库，也可以是一个后台，只要是tcp协议的就可以。
+
 ### 编译
 
 ` go build -trimpath -ldflags="-w -s" `
