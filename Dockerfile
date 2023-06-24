@@ -12,7 +12,7 @@ COPY . ./
 
 RUN  go build  -ldflags="-w -s" -o /build/go-p2ptunnel .
 
-FROM alpine:3.17
+FROM alpine:3.18
 
 WORKDIR /
 RUN apk update --no-cache && apk upgrade && apk add --no-cache ca-certificates
