@@ -47,6 +47,11 @@ archives:
 checksum:
   name_template: 'checksums.txt'
   algorithm: sha512
+
+signs:
+  - artifacts: all
+    args: ["--armor","--detach-sign", "${artifact}"]
+
 snapshot:
   name_template: "{{ .Tag }}"
 changelog:
