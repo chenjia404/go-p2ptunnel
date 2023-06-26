@@ -58,7 +58,7 @@ Then a friend can connect to 127.0.0.1:10089 on the remote desktop.
 
 ### releases
 
-`goreleaser release --skip-publish  --rm-dist`
+`goreleaser release --skip-publish --skip-validate --rm-dist`
 
 
 ### Service publishing and sharing(todo)
