@@ -19,7 +19,7 @@ The node private key file is in the current directory, the suffix of the file na
 | user      | string           | specify which local key file to use                                                                                                                                                     |
 | update    | bool             | Update the latest version from GitHub, it will verify the upgrade package signature, sha512                                                                                             |
 | max_peers | int              | Maximum number of connections, default 500                                                                                                                                              |
-
+| socks5 | ip         | socks5 listens to ip, for example 127.0.0.1:10086, if the l field is empty, use this field                         |
 ### build
 
 ` go build -trimpath -ldflags="-w -s" `

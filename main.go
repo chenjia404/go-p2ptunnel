@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/things-go/go-socks5"
 	"io"
 	"io/ioutil"
 	"log"
@@ -83,7 +84,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 }
 
 var (
-	version   = "0.0.15"
+	version   = "0.0.16"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -161,6 +162,20 @@ RE:
 	fmt.Println("Your id: " + h.ID().String())
 	if nodisc {
 		fmt.Println("Turn off node discovery")
+	}
+
+	if len(config.Cfg.Socks5) >= 6 {
+		server := socks5.NewServer(
+			socks5.WithLogger(socks5.NewLogger(log.New(os.Stdout, "socks5: ", log.LstdFlags))),
+		)
+
+		// Create SOCKS5 proxy on localhost port 8000
+		go func() {
+			if err := server.ListenAndServe("tcp", config.Cfg.Socks5); err != nil {
+				panic(err)
+			}
+		}()
+		log.Printf("socks5 open:%s\n", config.Cfg.Socks5)
 	}
 
 	//打开隧道
