@@ -8,6 +8,7 @@ require (
 	github.com/multiformats/go-multiaddr v0.9.0
 	github.com/polydawn/refmt v0.89.0
 	github.com/spf13/viper v1.16.0
+	github.com/things-go/go-socks5 v0.0.3
 	golang.org/x/crypto v0.10.0
 )
 
@@ -104,7 +105,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
-	github.com/things-go/go-socks5 v0.0.3 // indirect
 	github.com/whyrusleeping/go-keyspace v0.0.0-20160322163242-5b898ac5add1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel v1.16.0 // indirect
