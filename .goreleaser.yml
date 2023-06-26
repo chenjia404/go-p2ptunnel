@@ -33,8 +33,6 @@ builds:
       - ./dontoptimizeme=-N
     gcflags:
       - all=-trimpath={{.Env.GOPATH}}
-    hooks: ./sign.bat
-
 
 archives:
   -
@@ -44,7 +42,6 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
-
 
 
 checksum:
