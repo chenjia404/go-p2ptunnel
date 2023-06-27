@@ -167,7 +167,6 @@ func CheckGithubVersion(Version string) {
 	fmt.Println("current version: ", Version)
 	fmt.Println("Update to version: ", githubVerion)
 	fmt.Println("Ready to restart")
-	time.Sleep(time.Second * 5) //更新前休眠5秒，避免重复冲突
 	os.Exit(0)
 }
 

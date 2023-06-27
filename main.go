@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/things-go/go-socks5"
 	"io"
 	"io/ioutil"
 	"log"
@@ -13,6 +12,8 @@ import (
 	"runtime"
 	"sync"
 	"time"
+
+	"github.com/things-go/go-socks5"
 
 	"github.com/chenjia404/go-p2ptunnel/config"
 	"github.com/chenjia404/go-p2ptunnel/p2p"
@@ -84,7 +85,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 }
 
 var (
-	version   = "0.0.16"
+	version   = "0.0.17"
 	gitRev    = ""
 	buildTime = ""
 )
