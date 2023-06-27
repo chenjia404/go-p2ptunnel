@@ -157,7 +157,7 @@ func CheckGithubVersion(Version string) {
 			return
 		}
 	} else {
-		err = UnTarGz(fmt.Sprintf("update.%s", archivesFormat), ".")
+		err = UnTarGz(fmt.Sprintf("update.%s", archivesFormat), "")
 		if err != nil {
 			fmt.Println(err)
 			return
