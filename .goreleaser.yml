@@ -50,6 +50,7 @@ checksum:
 
 signs:
   - artifacts: all
+    signature: "${artifact}.asc"
     args: ["--armor","--detach-sign", "${artifact}"]
 
 snapshot:
