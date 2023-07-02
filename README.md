@@ -2,7 +2,7 @@
 
 ## go-p2ptunnel
 
-Use libp2p to establish a tcp tunnel (does not support udp), the underlying transmission can be realized using quic, tcp, package websocket, webtransport, use the noise protocol to encrypt the transmission, comes with nat, and can be used in multi-layer combinations.
+Use libp2p to establish a tcp tunnel (does not support udp), the underlying transmission can be realized using quic, tcp, websocket, webtransport, use the noise protocol to encrypt the transmission, comes with nat, and can be used in multi-layer combinations.
 
 If there is no public network ip, you can use the node id to connect. If there is a situation, directly specify the ip and communication protocol to connect.
 
