@@ -75,7 +75,7 @@ v0.0.6 以后，程序会自动从GitHub更新最新版版本，会验证文件�
 
 ### 打包
 
-`goreleaser release --skip-publish --skip-validate --rm-dist`
+`goreleaser release --skip-publish --skip-validate --clean`
 
 
 ### 服务发布和分享(todo)
