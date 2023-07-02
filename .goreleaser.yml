@@ -39,6 +39,8 @@ archives:
     id: go-p2ptunnel
     format: tar.gz
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    builds_info:
+      mode: 0777
     format_overrides:
       - goos: windows
         format: zip

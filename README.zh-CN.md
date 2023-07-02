@@ -17,6 +17,7 @@
 | nodisc    | bool        | 禁止广播提高性能，连接节点必须使用带ip和端口的链接                                             |
 | user      | string      | 指定使用本地的哪一个key文件                                                        |
 | update    | bool        | 从GitHub更新最新版，会验证升级包签名、sha512                                           |
+| auto_update    | bool        | 开启自动更新                                           |
 | max_peers | int         | 最大连接数，默认500                                                            |
 | socks5 | ip         | socks5监听ip，例如 127.0.0.1:10086，如果l字段为空，就使用这个字段                          |
 

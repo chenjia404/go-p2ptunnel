@@ -18,6 +18,7 @@ The node private key file is in the current directory, the suffix of the file na
 | nodisc    | bool             | Prohibit broadcasting to improve performance, connecting nodes must use links with ip and port                                                                                          |
 | user      | string           | specify which local key file to use                                                                                                                                                     |
 | update    | bool             | Update the latest version from GitHub, it will verify the upgrade package signature, sha512                                                                                             |
+| auto_update    | bool        | auto update                                           |
 | max_peers | int              | Maximum number of connections, default 500                                                                                                                                              |
 | socks5 | ip         | socks5 listens to ip, for example 127.0.0.1:10086, if the l field is empty, use this field                         |
 ### build

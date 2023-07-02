@@ -85,7 +85,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 }
 
 var (
-	version   = "0.0.17"
+	version   = "0.0.18"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -138,6 +138,9 @@ RE:
 			os.Exit(0)
 		}()
 
+		if config.Cfg.AutoUpdate {
+			update.CheckGithubVersion(version)
+		}
 	}
 
 	fmt.Printf("p2ptunnel %s-%s\n", version, gitRev)

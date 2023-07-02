@@ -2,9 +2,10 @@ package config
 
 import (
 	"flag"
-	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
+
+	"github.com/spf13/viper"
 )
 
 var ip = flag.String("l", "", "forwarder to ip or listen ip")
@@ -15,6 +16,7 @@ var flag_nodisc = flag.Bool("nodisc", false, "Turn off node discovery")
 var flag_user = flag.String("user", "user", "Turn off node discovery")
 var networkType = flag.String("type", "tcp", "network type tcp/udp")
 var flag_update = flag.Bool("update", false, "update form github")
+var flag_auto_update = flag.Bool("auto_update", false, "update form github")
 var configPath = flag.String("config", "", "config file")
 var socks5 = flag.String("socks5", "", "socks5 listen ip")
 
@@ -29,6 +31,7 @@ type Conf struct {
 	MaxPeers   int
 	Nodisc     bool
 	Update     bool
+	AutoUpdate bool
 	ConfigPath string
 }
 
@@ -80,6 +83,7 @@ func LoadConfigByPath(p string) error {
 	Cfg.MaxPeers = viper.GetInt("net.max_peers")
 	Cfg.Nodisc = viper.GetBool("net.no_disc")
 	Cfg.Update = *flag_update
+	Cfg.AutoUpdate = *flag_auto_update
 	if len(Cfg.Socks5) >= 6 && len(Cfg.Listen) == 0 {
 		Cfg.Listen = Cfg.Socks5
 	}
