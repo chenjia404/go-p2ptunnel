@@ -1,0 +1,12 @@
+FROM alpine:3
+
+ARG VERSION
+ENV VERSION=$VERSION
+
+WORKDIR /app/
+RUN apk update --no-cache && apk upgrade && apk add --no-cache ca-certificates
+
+COPY go-p2ptunnel /app/go-p2ptunnel
+
+EXPOSE 18080
+ENTRYPOINT   ["/app/go-p2ptunnel"]

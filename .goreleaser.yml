@@ -63,3 +63,14 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+
+dockers:
+  -
+    id: go-p2ptunnel
+    goos: linux
+    goarch: amd64
+    dockerfile: "goreleaser.dockefile"
+    extra_files:
+      - LICENSE.txt
+    image_templates:
+      - "chenjia404/{{.ProjectName}}:latest"
