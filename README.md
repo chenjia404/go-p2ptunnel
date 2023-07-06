@@ -62,6 +62,15 @@ Then a friend can connect to 127.0.0.1:10089 on the remote desktop.
 `goreleaser release --skip-publish --skip-validate --clean`
 
 
+### verify signature
+
+```
+gpg --recv-key E1346252ED662364CA37F716189BE79683369DA3
+
+gpg --verify .\ethtweet_0.7.4_windows_amd64.zip.asc .\ethtweet_0.7.4_windows_amd64.zip
+```
+If `Primary key fingerprint: E134 6252 ED66 2364 CA37 F716 189B E796 8336 9DA3` appears, the verification is successful
+
 ### Service publishing and sharing(todo)
 
 You can publish your service, and after other nodes search for the service name, they can connect and use it. Must be a tcp-based service, udp is not supported yet.
