@@ -18,8 +18,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ProtonMail/go-crypto/openpgp"
 	"github.com/polydawn/refmt/json"
-	"golang.org/x/crypto/openpgp"
 )
 
 func CheckGithubVersion(Version string) {
@@ -367,13 +367,16 @@ func VerifySignature(filename string) (bool, error) {
 		fmt.Println(err)
 		return false, err
 	}
+	defer signature.Close()
 
 	verificationTarget, err := os.Open(filename)
 	if err != nil {
 		fmt.Println(err)
 		return false, err
 	}
-	entity, err := openpgp.CheckArmoredDetachedSignature(keyring, verificationTarget, signature)
+	defer verificationTarget.Close()
+
+	entity, err := openpgp.CheckArmoredDetachedSignature(keyring, verificationTarget, signature, nil)
 	if err != nil {
 		fmt.Println("Check Detached Signature: " + err.Error())
 		return false, err

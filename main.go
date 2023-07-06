@@ -85,7 +85,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 }
 
 var (
-	version   = "0.1.19"
+	version   = "0.2.20"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -159,7 +159,7 @@ RE:
 	h, err := p2p.CreateLibp2pHost(ctx, priv, config.Cfg.P2pPort, config.Cfg.MaxPeers, config.Cfg.Nodisc, Protocol)
 	if err != nil {
 		cancel()
-		fmt.Printf("err", err)
+		fmt.Printf("err:%s", err.Error())
 		//return nil, nil, err
 	}
 

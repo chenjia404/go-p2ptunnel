@@ -53,7 +53,7 @@ checksum:
 signs:
   - artifacts: all
     signature: "${artifact}.asc"
-    args: ["--armor","--detach-sign", "${artifact}"]
+    args: ["--armor","-u","189BE79683369DA3","--detach-sign", "${artifact}"]
 
 snapshot:
   name_template: "{{ .Tag }}"
