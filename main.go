@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -38,7 +37,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 	if err == nil {
 		defer pkFile.Close()
 
-		b, err := ioutil.ReadAll(pkFile)
+		b, err := io.ReadAll(pkFile)
 		if err != nil {
 			return nil, err
 		}
