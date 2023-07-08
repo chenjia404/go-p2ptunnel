@@ -84,7 +84,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 }
 
 var (
-	version   = "0.2.21"
+	version   = "0.2.22"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -128,17 +128,16 @@ RE:
 		return
 	} else {
 
-		go func() {
-			now := time.Now()
-			next := now.Add(time.Hour * 4)
-			timer := time.NewTimer(next.Sub(now))
-			t := <-timer.C //从定时器拿数据
-			fmt.Println("restart time:", t)
-			os.Exit(0)
-		}()
-
 		if config.Cfg.AutoUpdate {
-			go update.CheckGithubVersion(version)
+
+			go func() {
+				now := time.Now()
+				next := now.Add(time.Hour * 24)
+				timer := time.NewTimer(next.Sub(now))
+				t := <-timer.C //从定时器拿数据
+				fmt.Println("CheckGithubVersion time:", t)
+				update.CheckGithubVersion(version)
+			}()
 		}
 	}
 
