@@ -37,6 +37,8 @@
 
 服务器的服务可以是一个数据库，也可以是一个后台，只要是tcp协议的就可以。
 
+[使用go-p2ptunnel搭建一个socks5的代理](./docs/socks5.zh-CN.md)
+
 ### 编译
 
 ` go build -trimpath -ldflags="-w -s" `
