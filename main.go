@@ -84,7 +84,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 }
 
 var (
-	version   = "0.2.22"
+	version   = "0.2.23"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -129,7 +129,7 @@ RE:
 	} else {
 
 		if config.Cfg.AutoUpdate {
-
+			go update.CheckGithubVersion(version)
 			go func() {
 				now := time.Now()
 				next := now.Add(time.Hour * 24)
