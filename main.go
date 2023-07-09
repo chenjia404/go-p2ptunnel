@@ -130,13 +130,13 @@ RE:
 
 		if config.Cfg.AutoUpdate {
 			go update.CheckGithubVersion(version)
+
+			ticker := time.NewTicker(time.Hour * 24)
 			go func() {
-				now := time.Now()
-				next := now.Add(time.Hour * 24)
-				timer := time.NewTimer(next.Sub(now))
-				t := <-timer.C //从定时器拿数据
-				fmt.Println("CheckGithubVersion time:", t)
-				update.CheckGithubVersion(version)
+				for t := range ticker.C {
+					fmt.Println("CheckGithubVersion time:", t)
+					update.CheckGithubVersion(version)
+				}
 			}()
 		}
 	}
