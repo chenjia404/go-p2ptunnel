@@ -3,7 +3,7 @@ module github.com/chenjia404/go-p2ptunnel
 go 1.20
 
 require (
-	github.com/ProtonMail/go-crypto v0.0.0-20230626094100-7e9e0395ebec
+	github.com/ProtonMail/go-crypto v0.0.0-20230710112148-e01326fd72eb
 	github.com/libp2p/go-libp2p v0.28.1
 	github.com/libp2p/go-libp2p-kad-dht v0.24.2
 	github.com/multiformats/go-multiaddr v0.10.1
