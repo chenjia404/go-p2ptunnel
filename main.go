@@ -84,7 +84,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 }
 
 var (
-	version   = "0.2.25"
+	version   = "0.2.26"
 	gitRev    = ""
 	buildTime = ""
 )
