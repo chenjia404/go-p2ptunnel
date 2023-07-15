@@ -208,12 +208,16 @@ func UnTarGz(tarFile, dest string) error {
 		}
 		if hdr.Typeflag != tar.TypeDir {
 
+			// Get file information
+			fi := hdr.FileInfo()
 			filename := dest + hdr.Name
 			file, err := createFile(filename)
 			if err != nil {
 				return err
 			}
 			io.Copy(file, tr)
+			// Set the file permission, so that it can be guaranteed to be the same as the original file permission. If not set, it will be set according to the umask of the current system.
+			os.Chmod(fi.Name(), fi.Mode().Perm())
 		}
 	}
 	return nil
