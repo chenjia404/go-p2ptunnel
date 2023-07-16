@@ -84,7 +84,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 }
 
 var (
-	version   = "0.2.26"
+	version   = "0.2.27"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -129,7 +129,6 @@ RE:
 	} else {
 
 		if config.Cfg.AutoUpdate {
-			go update.CheckGithubVersion(version)
 
 			ticker := time.NewTicker(time.Hour * 24)
 			go func() {
@@ -145,6 +144,10 @@ RE:
 	fmt.Printf("buildTime %s\n", buildTime)
 	fmt.Printf("System version: %s\n", runtime.GOARCH+"/"+runtime.GOOS)
 	fmt.Printf("Golang version: %s\n", runtime.Version())
+	if config.Cfg.AutoUpdate {
+		fmt.Printf("AutoUpdate:open")
+		go update.CheckGithubVersion(version)
+	}
 
 	if len(config.Cfg.User) > 0 {
 		user = config.Cfg.User
