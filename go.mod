@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230717121422-5aa5874ade95
 	github.com/libp2p/go-libp2p v0.29.0
-	github.com/libp2p/go-libp2p-kad-dht v0.24.2
+	github.com/libp2p/go-libp2p-kad-dht v0.24.3
 	github.com/multiformats/go-multiaddr v0.10.1
 	github.com/polydawn/refmt v0.89.0
 	github.com/spf13/viper v1.16.0
