@@ -53,6 +53,7 @@ checksum:
 signs:
   - artifacts: all
     signature: "${artifact}.asc"
+    cmd: C:\soft\GnuPG\bin\gpg.exe
     args: ["--armor","-u","189BE79683369DA3","--detach-sign", "${artifact}"]
 
 snapshot:
@@ -66,7 +67,7 @@ changelog:
 
 dockers:
   -
-    id: go-p2ptunnel
+    id: 1
     goos: linux
     goarch: amd64
     dockerfile: "goreleaser.dockefile"
@@ -74,3 +75,16 @@ dockers:
       - LICENSE.txt
     image_templates:
       - "chenjia404/{{.ProjectName}}:latest"
+      - "chenjia404/{{.ProjectName}}:latest-amd64"
+      - "chenjia404/{{.ProjectName}}:amd64"
+  -
+    id: 2
+    goarch: arm64
+    dockerfile: "goreleaser.dockefile"
+    extra_files:
+      - LICENSE.txt
+    build_flag_templates:
+      - "--platform=linux/arm64"
+    image_templates:
+      - "chenjia404/{{.ProjectName}}:latest-arm64"
+      - "chenjia404/{{.ProjectName}}:arm64"
