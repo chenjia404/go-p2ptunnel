@@ -9,7 +9,7 @@ require (
 	github.com/multiformats/go-multiaddr v0.12.2
 	github.com/polydawn/refmt v0.89.0
 	github.com/spf13/viper v1.18.2
-	github.com/things-go/go-socks5 v0.0.4
+	github.com/things-go/go-socks5 v0.0.5
 )
 
 require (
@@ -122,7 +122,7 @@ require (
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/mod v0.13.0 // indirect
-	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
