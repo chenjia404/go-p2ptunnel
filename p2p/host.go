@@ -3,6 +3,7 @@ package p2p
 import (
 	"context"
 	"fmt"
+	libp2ptls "github.com/libp2p/go-libp2p/p2p/security/tls"
 	"log"
 	"time"
 
@@ -54,6 +55,7 @@ func CreateLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, max
 		libp2p.DefaultTransports,
 
 		libp2p.Security(noise.ID, noise.New),
+		libp2p.Security(libp2ptls.ID, libp2ptls.New),
 
 		libp2p.ConnectionManager(connmgr_),
 
