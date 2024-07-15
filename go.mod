@@ -6,7 +6,7 @@ toolchain go1.22.5
 
 require (
 	github.com/ProtonMail/go-crypto v1.0.0
-	github.com/libp2p/go-libp2p v0.35.2
+	github.com/libp2p/go-libp2p v0.35.3
 	github.com/libp2p/go-libp2p-kad-dht v0.25.2
 	github.com/multiformats/go-multiaddr v0.13.0
 	github.com/polydawn/refmt v0.89.0
