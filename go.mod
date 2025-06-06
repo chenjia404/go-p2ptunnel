@@ -8,7 +8,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.1.6
 	github.com/libp2p/go-libp2p v0.41.1
 	github.com/libp2p/go-libp2p-kad-dht v0.30.2
-	github.com/multiformats/go-multiaddr v0.15.0
+	github.com/multiformats/go-multiaddr v0.16.0
 	github.com/polydawn/refmt v0.89.0
 	github.com/spf13/viper v1.20.0
 	github.com/things-go/go-socks5 v0.0.5
