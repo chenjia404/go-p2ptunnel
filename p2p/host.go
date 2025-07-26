@@ -3,9 +3,10 @@ package p2p
 import (
 	"context"
 	"fmt"
-	libp2ptls "github.com/libp2p/go-libp2p/p2p/security/tls"
 	"log"
 	"time"
+
+	libp2ptls "github.com/libp2p/go-libp2p/p2p/security/tls"
 
 	"github.com/libp2p/go-libp2p"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
@@ -17,9 +18,41 @@ import (
 	routing2 "github.com/libp2p/go-libp2p/p2p/discovery/routing"
 	"github.com/libp2p/go-libp2p/p2p/net/connmgr"
 	"github.com/libp2p/go-libp2p/p2p/security/noise"
+	"github.com/multiformats/go-multiaddr"
 )
 
 var d *dht.IpfsDHT
+
+// 已知的中繼節點列表（可以根據需要添加更多）
+var knownRelayPeers = []string{
+	"/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN",
+	"/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa",
+	"/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb",
+}
+
+// connectToRelayPeers 連接到已知的中繼節點
+func connectToRelayPeers(ctx context.Context, h host.Host) {
+	for _, relayAddrStr := range knownRelayPeers {
+		relayAddr, err := multiaddr.NewMultiaddr(relayAddrStr)
+		if err != nil {
+			log.Printf("解析中繼節點地址失敗: %v", err)
+			continue
+		}
+
+		pi, err := peer.AddrInfoFromP2pAddr(relayAddr)
+		if err != nil {
+			log.Printf("解析中繼節點地址失敗: %v", err)
+			continue
+		}
+
+		err = h.Connect(ctx, *pi)
+		if err != nil {
+			log.Printf("連接中繼節點失敗 %s: %v", pi.ID, err)
+		} else {
+			log.Printf("成功連接到中繼節點: %s", pi.ID)
+		}
+	}
+}
 
 func CreateLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, maxPeers int, nodisc bool, Protocol string) (host.Host, error) {
 
@@ -61,10 +94,16 @@ func CreateLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, max
 
 		libp2p.NATPortMap(),
 
-		libp2p.EnableRelay(),
-		libp2p.EnableNATService(),
-		libp2p.EnableRelayService(),
-		libp2p.ForceReachabilityPublic(),
+		// 中繼功能配置
+		libp2p.EnableRelay(),             // 啟用中繼功能
+		libp2p.EnableNATService(),        // 啟用 NAT 服務
+		libp2p.EnableRelayService(),      // 啟用中繼服務
+		libp2p.ForceReachabilityPublic(), // 強制設為公網可達
+
+		// 可選：更細緻的中繼配置
+		// libp2p.EnableRelayWithHopLimit(3), // 限制中繼跳數
+		// libp2p.EnableRelayWithResourceManager(), // 啟用資源管理
+
 		libp2p.DefaultPeerstore,
 
 		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
@@ -88,6 +127,9 @@ func CreateLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, max
 		}
 		h.Connect(ctx, *pi)
 	}
+
+	// 連接到已知的中繼節點
+	go connectToRelayPeers(ctx, h)
 
 	if !nodisc {
 		_, h2, err2 := nodeDiscovery(ctx, h, Protocol)
