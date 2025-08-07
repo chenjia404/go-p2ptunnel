@@ -2,7 +2,7 @@ module github.com/chenjia404/go-p2ptunnel
 
 go 1.23.8
 
-toolchain go1.24.1
+toolchain go1.24.6
 
 require (
 	github.com/ProtonMail/go-crypto v1.1.6
