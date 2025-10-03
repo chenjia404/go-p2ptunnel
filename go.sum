@@ -335,6 +335,8 @@ github.com/libp2p/go-libp2p-kad-dht v0.30.2 h1:K0LJPdXynQ+u3rx6uFlrfNy0i11LE6SOC
 github.com/libp2p/go-libp2p-kad-dht v0.30.2/go.mod h1:UV0mxF4ufh/ht05jNg5mcjOMrjK82uecgANa+GKi4y0=
 github.com/libp2p/go-libp2p-kad-dht v0.35.0 h1:pWRC4FKR9ptQjA9DuMSrAn2D3vABE8r58iAeoLoK1Ig=
 github.com/libp2p/go-libp2p-kad-dht v0.35.0/go.mod h1:s70f017NjhsBx+SVl0/w+x//uyglrFpKLfvuQJj4QAU=
+github.com/libp2p/go-libp2p-kad-dht v0.35.1 h1:RQglhc9OxqDwlFFdhQMwKxIPBIBfGsleROnK5hqVsoE=
+github.com/libp2p/go-libp2p-kad-dht v0.35.1/go.mod h1:1oCXzkkBiYh3d5cMWLpInSOZ6am2AlpC4G+GDcZFcE0=
 github.com/libp2p/go-libp2p-kbucket v0.6.3 h1:p507271wWzpy2f1XxPzCQG9NiN6R6lHL9GiSErbQQo0=
 github.com/libp2p/go-libp2p-kbucket v0.6.3/go.mod h1:RCseT7AH6eJWxxk2ol03xtP9pEHetYSPXOaJnOiD8i0=
 github.com/libp2p/go-libp2p-kbucket v0.6.4 h1:OjfiYxU42TKQSB8t8WYd8MKhYhMJeO2If+NiuKfb6iQ=
