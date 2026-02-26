@@ -1,5 +1,6 @@
 # This is an example .goreleaser.yml file with some sane defaults.
 # Make sure to check the documentation at http://goreleaser.com
+version: 2
 project_name: go-p2ptunnel
 before:
   hooks:
@@ -37,13 +38,13 @@ builds:
 archives:
   -
     id: go-p2ptunnel
-    format: tar.gz
+    formats: tar.gz
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     builds_info:
       mode: 0777
     format_overrides:
       - goos: windows
-        format: zip
+        formats: zip
 
 
 checksum:
@@ -57,7 +58,7 @@ signs:
     args: ["--armor","-u","189BE79683369DA3","--detach-sign", "${artifact}"]
 
 snapshot:
-  name_template: "{{ .Tag }}"
+  version_template: "{{ .Tag }}"
 changelog:
   sort: asc
   filters:
@@ -65,26 +66,15 @@ changelog:
       - '^docs:'
       - '^test:'
 
-dockers:
-  -
-    id: 1
-    goos: linux
-    goarch: amd64
-    dockerfile: "goreleaser.dockefile"
-    extra_files:
-      - LICENSE.txt
-    image_templates:
+dockers_v2:
+  - 
+    images:
       - "chenjia404/{{.ProjectName}}:latest"
       - "chenjia404/{{.ProjectName}}:latest-amd64"
       - "chenjia404/{{.ProjectName}}:amd64"
-  -
-    id: 2
-    goarch: arm64
+    platforms:
+      - linux/amd64
+      - linux/arm64
     dockerfile: "goreleaser.dockefile"
     extra_files:
       - LICENSE.txt
-    build_flag_templates:
-      - "--platform=linux/arm64"
-    image_templates:
-      - "chenjia404/{{.ProjectName}}:latest-arm64"
-      - "chenjia404/{{.ProjectName}}:arm64"
