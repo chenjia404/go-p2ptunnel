@@ -69,9 +69,10 @@ changelog:
 dockers_v2:
   - 
     images:
-      - "chenjia404/{{.ProjectName}}:latest"
-      - "chenjia404/{{.ProjectName}}:latest-amd64"
-      - "chenjia404/{{.ProjectName}}:amd64"
+      - "chenjia404/{{.ProjectName}}"
+    tags:
+      - latest
+      - "{{.Version}}"
     platforms:
       - linux/amd64
       - linux/arm64
