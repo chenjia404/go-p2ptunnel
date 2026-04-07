@@ -21,6 +21,7 @@ The node private key file is in the current directory, the suffix of the file na
 | auto_update    | bool        | auto update                                           |
 | max_peers | int              | Maximum number of connections, default 500                                                                                                                                              |
 | socks5 | ip         | socks5 listens to ip, for example 127.0.0.1:10086, if the l field is empty, use this field                         |
+| http | ip         | http proxy listens to ip, for example 127.0.0.1:10087, if the l field is empty, use this field. Supports both HTTP and HTTPS CONNECT                         |
 ### build
 
 ` go build -trimpath -ldflags="-w -s" `
@@ -56,6 +57,15 @@ The complete ip plus port is required here.
 The connection may take a few seconds to 1 minute. After the connection is successful, the remote port is mapped to 127.0.0.1:10089
 
 Then a friend can connect to 127.0.0.1:10089 on the remote desktop.
+
+### start local HTTP/HTTPS proxy
+Remote side:
+`./go-p2ptunnel -nodisc -http 127.0.0.1:10087`
+
+Local side:
+`./go-p2ptunnel -id 12D3 -l 127.0.0.1:10087`
+
+Then configure the client program to use `http://127.0.0.1:10087` as its proxy. HTTPS is supported through the `CONNECT` method.
 
 ### releases
 

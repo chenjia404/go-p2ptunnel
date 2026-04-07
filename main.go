@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -84,7 +85,7 @@ func loadUserPrivKey() (priv crypto.PrivKey, err error) {
 }
 
 var (
-	version   = "0.2.33"
+	version   = "0.2.35"
 	gitRev    = ""
 	buildTime = ""
 )
@@ -181,6 +182,14 @@ RE:
 			}
 		}()
 		log.Printf("socks5 open:%s\n", config.Cfg.Socks5)
+	}
+	if len(config.Cfg.HTTPProxy) >= 6 {
+		go func() {
+			if err := startHTTPProxy(config.Cfg.HTTPProxy); err != nil {
+				panic(err)
+			}
+		}()
+		log.Printf("http proxy open:%s\n", config.Cfg.HTTPProxy)
 	}
 
 	//打开隧道
@@ -331,4 +340,103 @@ func pipe(src net.Conn, dest network.Stream) {
 		onClose(err)
 	}()
 	wg.Wait()
+}
+
+func startHTTPProxy(listenAddr string) error {
+	server := &http.Server{
+		Addr:    listenAddr,
+		Handler: http.HandlerFunc(handleHTTPProxy),
+	}
+	return server.ListenAndServe()
+}
+
+func handleHTTPProxy(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodConnect {
+		handleHTTPConnect(w, r)
+		return
+	}
+
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.Proxy = nil
+	req := r.Clone(r.Context())
+	req.RequestURI = ""
+	removeHopHeaders(req.Header)
+	if req.URL.Scheme == "" {
+		req.URL.Scheme = "http"
+	}
+	if req.URL.Host == "" {
+		req.URL.Host = r.Host
+	}
+
+	resp, err := transport.RoundTrip(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadGateway)
+		return
+	}
+	defer resp.Body.Close()
+
+	removeHopHeaders(resp.Header)
+	copyHeader(w.Header(), resp.Header)
+	w.WriteHeader(resp.StatusCode)
+	_, _ = io.Copy(w, resp.Body)
+}
+
+func handleHTTPConnect(w http.ResponseWriter, r *http.Request) {
+	dstConn, err := net.Dial("tcp", r.Host)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadGateway)
+		return
+	}
+
+	hijacker, ok := w.(http.Hijacker)
+	if !ok {
+		_ = dstConn.Close()
+		http.Error(w, "proxy does not support hijacking", http.StatusInternalServerError)
+		return
+	}
+
+	clientConn, buf, err := hijacker.Hijack()
+	if err != nil {
+		_ = dstConn.Close()
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, _ = clientConn.Write([]byte("HTTP/1.1 200 Connection Established\r\n\r\n"))
+	if n := buf.Reader.Buffered(); n > 0 {
+		_, _ = io.CopyN(dstConn, buf, int64(n))
+	}
+
+	go proxyConn(dstConn, clientConn)
+	go proxyConn(clientConn, dstConn)
+}
+
+func proxyConn(dst net.Conn, src net.Conn) {
+	defer dst.Close()
+	defer src.Close()
+	_, _ = io.Copy(dst, src)
+}
+
+func copyHeader(dst, src http.Header) {
+	for k, vv := range src {
+		for _, v := range vv {
+			dst.Add(k, v)
+		}
+	}
+}
+
+func removeHopHeaders(header http.Header) {
+	for _, key := range []string{
+		"Connection",
+		"Proxy-Connection",
+		"Keep-Alive",
+		"Proxy-Authenticate",
+		"Proxy-Authorization",
+		"Te",
+		"Trailer",
+		"Transfer-Encoding",
+		"Upgrade",
+	} {
+		header.Del(key)
+	}
 }

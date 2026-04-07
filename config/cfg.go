@@ -19,6 +19,7 @@ var flag_update = flag.Bool("update", false, "update form github")
 var flag_auto_update = flag.Bool("auto_update", false, "update form github")
 var configPath = flag.String("config", "", "config file")
 var socks5 = flag.String("socks5", "", "socks5 listen ip")
+var httpProxy = flag.String("http", "", "http proxy listen ip")
 
 var Cfg *Conf
 
@@ -26,6 +27,7 @@ type Conf struct {
 	User       string
 	Listen     string
 	Socks5     string
+	HTTPProxy  string
 	Id         string
 	P2pPort    int
 	MaxPeers   int
@@ -50,17 +52,20 @@ func LoadConfigByPath(p string) error {
 	}
 	if p == "" {
 		Cfg = &Conf{
-			User:     *flag_user,
-			Listen:   *ip,
-			Socks5:   *socks5,
-			Id:       *id,
-			P2pPort:  *p2p_port,
-			MaxPeers: *max_peers,
-			Nodisc:   *flag_nodisc,
-			Update:   *flag_update,
+			User:      *flag_user,
+			Listen:    *ip,
+			Socks5:    *socks5,
+			HTTPProxy: *httpProxy,
+			Id:        *id,
+			P2pPort:   *p2p_port,
+			MaxPeers:  *max_peers,
+			Nodisc:    *flag_nodisc,
+			Update:    *flag_update,
 		}
 		if len(Cfg.Socks5) >= 6 && len(Cfg.Listen) == 0 {
 			Cfg.Listen = Cfg.Socks5
+		} else if len(Cfg.HTTPProxy) >= 6 && len(Cfg.Listen) == 0 {
+			Cfg.Listen = Cfg.HTTPProxy
 		}
 		return nil
 	}
@@ -78,6 +83,7 @@ func LoadConfigByPath(p string) error {
 	Cfg.User = viper.GetString("key.user")
 	Cfg.Listen = viper.GetString("net.listen")
 	Cfg.Socks5 = viper.GetString("net.socks5")
+	Cfg.HTTPProxy = viper.GetString("net.http")
 	Cfg.Id = viper.GetString("net.id")
 	Cfg.P2pPort = viper.GetInt("net.p2p_port")
 	Cfg.MaxPeers = viper.GetInt("net.max_peers")
@@ -86,6 +92,8 @@ func LoadConfigByPath(p string) error {
 	Cfg.AutoUpdate = *flag_auto_update
 	if len(Cfg.Socks5) >= 6 && len(Cfg.Listen) == 0 {
 		Cfg.Listen = Cfg.Socks5
+	} else if len(Cfg.HTTPProxy) >= 6 && len(Cfg.Listen) == 0 {
+		Cfg.Listen = Cfg.HTTPProxy
 	}
 	return nil
 }
