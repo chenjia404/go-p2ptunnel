@@ -7,7 +7,7 @@ require (
 	github.com/libp2p/go-libp2p v0.48.0
 	github.com/libp2p/go-libp2p-kad-dht v0.39.1
 	github.com/multiformats/go-multiaddr v0.16.1
-	github.com/polydawn/refmt v0.89.1-0.20231129105047-37766d95467a
+	github.com/polydawn/refmt v0.89.1-0.20260518093548-e3f81f54bd76
 	github.com/spf13/viper v1.21.0
 	github.com/things-go/go-socks5 v0.1.1
 )
