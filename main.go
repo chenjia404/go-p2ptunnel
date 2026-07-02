@@ -90,7 +90,6 @@ var (
 	buildTime = ""
 )
 
-var nodisc bool
 var user = "user"
 
 func main() {
@@ -156,17 +155,20 @@ RE:
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	priv, _ := loadUserPrivKey()
+	priv, err := loadUserPrivKey()
+	if err != nil {
+		cancel()
+		log.Fatalf("加载用户私钥失败: %v", err)
+	}
 
 	h, err := p2p.CreateLibp2pHost(ctx, priv, config.Cfg.P2pPort, config.Cfg.MaxPeers, config.Cfg.Nodisc, Protocol)
 	if err != nil {
 		cancel()
-		fmt.Printf("err:%s", err.Error())
-		//return nil, nil, err
+		log.Fatalf("创建 libp2p host 失败: %v", err)
 	}
 
 	fmt.Println("Your id: " + h.ID().String())
-	if nodisc {
+	if config.Cfg.Nodisc {
 		fmt.Println("Turn off node discovery")
 	}
 
@@ -285,9 +287,10 @@ RE:
 						}
 					}
 					log.Println("open New Stream")
-					timeout, _ := context.WithTimeout(context.Background(), 5*time.Second)
+					timeout, cancelStream := context.WithTimeout(context.Background(), 5*time.Second)
 
 					s, err = h.NewStream(timeout, info.ID, Protocol)
+					cancelStream()
 					if err != nil {
 						fmt.Println("New Stream:" + err.Error())
 						err = h.Connect(ctx, *info)

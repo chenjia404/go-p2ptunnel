@@ -23,33 +23,33 @@ import (
 
 var d *dht.IpfsDHT
 
-// 已知的中繼節點列表（可以根據需要添加更多）
+// 已知的中继节点列表（可以根据需要添加更多）
 var knownRelayPeers = []string{
 	"/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN",
 	"/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa",
 	"/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb",
 }
 
-// connectToRelayPeers 連接到已知的中繼節點
+// connectToRelayPeers 连接到已知的中继节点
 func connectToRelayPeers(ctx context.Context, h host.Host) {
 	for _, relayAddrStr := range knownRelayPeers {
 		relayAddr, err := multiaddr.NewMultiaddr(relayAddrStr)
 		if err != nil {
-			log.Printf("解析中繼節點地址失敗: %v", err)
+			log.Printf("解析中继节点地址失败: %v", err)
 			continue
 		}
 
 		pi, err := peer.AddrInfoFromP2pAddr(relayAddr)
 		if err != nil {
-			log.Printf("解析中繼節點地址失敗: %v", err)
+			log.Printf("解析中继节点地址失败: %v", err)
 			continue
 		}
 
 		err = h.Connect(ctx, *pi)
 		if err != nil {
-			log.Printf("連接中繼節點失敗 %s: %v", pi.ID, err)
+			log.Printf("连接中继节点失败 %s: %v", pi.ID, err)
 		} else {
-			log.Printf("成功連接到中繼節點: %s", pi.ID)
+			log.Printf("成功连接到中继节点: %s", pi.ID)
 		}
 	}
 }
@@ -67,7 +67,7 @@ func CreateLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, max
 		wsPort = 0
 	}
 
-	h, err := libp2p.New(
+	opts := []libp2p.Option{
 		libp2p.Identity(priv),
 		libp2p.UserAgent("go-p2ptunnel"),
 
@@ -94,27 +94,30 @@ func CreateLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, max
 
 		libp2p.NATPortMap(),
 
-		// 中繼功能配置
-		libp2p.EnableRelay(),             // 啟用中繼功能
-		libp2p.EnableNATService(),        // 啟用 NAT 服務
-		libp2p.EnableRelayService(),      // 啟用中繼服務
-		libp2p.ForceReachabilityPublic(), // 強制設為公網可達
+		// 中继功能配置
+		libp2p.EnableRelay(),             // 启用中继功能
+		libp2p.EnableNATService(),        // 启用 NAT 服务
+		libp2p.EnableRelayService(),      // 启用中继服务
+		libp2p.ForceReachabilityPublic(), // 强制设为公网可达
 
-		// 可選：更細緻的中繼配置
-		// libp2p.EnableRelayWithHopLimit(3), // 限制中繼跳數
-		// libp2p.EnableRelayWithResourceManager(), // 啟用資源管理
+		// 可选：更细致的中继配置
+		// libp2p.EnableRelayWithHopLimit(3), // 限制中继跳数
+		// libp2p.EnableRelayWithResourceManager(), // 启用资源管理
 
 		libp2p.DefaultPeerstore,
+	}
 
-		libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
-			if !nodisc {
+	if !nodisc {
+		opts = append(opts,
+			libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
 				var err error
 				d, err = dht.New(ctx, h, dht.BootstrapPeers(dht.GetDefaultBootstrapPeerAddrInfos()...))
 				return d, err
-			}
-			return nil, nil
-		}),
-	)
+			}),
+		)
+	}
+
+	h, err := libp2p.New(opts...)
 	if err != nil {
 		return nil, err
 	}

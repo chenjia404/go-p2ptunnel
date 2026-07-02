@@ -129,7 +129,7 @@ func GetRunningPid() int {
 }
 
 func HandleEndSignal(fn func()) {
-	sig := make(chan os.Signal)
+	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	<-sig
 	_ = os.Remove(pidFile)
@@ -138,7 +138,7 @@ func HandleEndSignal(fn func()) {
 }
 
 func HandleReloadSignal(fn func()) {
-	sig := make(chan os.Signal)
+	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP)
 	for {
 		<-sig
