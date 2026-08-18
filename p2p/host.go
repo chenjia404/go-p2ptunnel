@@ -111,7 +111,8 @@ func CreateLibp2pHost(ctx context.Context, priv crypto.PrivKey, p2pPort int, max
 		opts = append(opts,
 			libp2p.Routing(func(h host.Host) (routing.PeerRouting, error) {
 				var err error
-				d, err = dht.New(ctx, h, dht.BootstrapPeers(dht.GetDefaultBootstrapPeerAddrInfos()...))
+				// v0.42+ 构造函数不再接收 context，DHT 生命周期由 Close() 管理
+				d, err = dht.New(h, dht.BootstrapPeers(dht.GetDefaultBootstrapPeerAddrInfos()...))
 				return d, err
 			}),
 		)
