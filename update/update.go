@@ -35,7 +35,16 @@ func CheckGithubVersion(Version string) {
 	if err != nil {
 		return
 	}
+	defer r.Body.Close()
+	if r.StatusCode != http.StatusOK {
+		fmt.Println("check latest release:", r.Status)
+		return
+	}
 	b, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	var v interface{}
 	err = json.Unmarshal(b, &v)
 	if err != nil {
@@ -54,7 +63,9 @@ func CheckGithubVersion(Version string) {
 		return
 	}
 
-	githubPublishedTime, _ := time.ParseInLocation("2006-01-02T15:04:05Z", fmt.Sprintf("%s", data["published_at"]), time.Local)
+	// published_at is UTC (RFC 3339 with a trailing "Z"); parsing it in
+	// time.Local would shift it by the local UTC offset.
+	githubPublishedTime, _ := time.Parse(time.RFC3339, fmt.Sprintf("%s", data["published_at"]))
 	if time.Now().Sub(githubPublishedTime) < (time.Second * 3600) {
 		fmt.Println("更新时间不足1个小时，延迟更新")
 		return
