@@ -5,7 +5,7 @@ go 1.27.1
 require (
 	github.com/ProtonMail/go-crypto v1.5.2
 	github.com/libp2p/go-libp2p v0.50.0
-	github.com/libp2p/go-libp2p-kad-dht v0.42.2
+	github.com/libp2p/go-libp2p-kad-dht v0.43.0
 	github.com/multiformats/go-multiaddr v0.16.1
 	github.com/polydawn/refmt v0.90.0
 	github.com/spf13/viper v1.21.0
