@@ -1,15 +1,15 @@
 module github.com/chenjia404/go-p2ptunnel
 
-go 1.27.1
+go 1.27.3
 
 require (
 	github.com/ProtonMail/go-crypto v1.5.2
-	github.com/libp2p/go-libp2p v0.50.0
-	github.com/libp2p/go-libp2p-kad-dht v0.42.2
+	github.com/libp2p/go-libp2p v0.51.0
+	github.com/libp2p/go-libp2p-kad-dht v0.43.0
 	github.com/multiformats/go-multiaddr v0.16.1
 	github.com/polydawn/refmt v0.90.0
 	github.com/spf13/viper v1.21.0
-	github.com/things-go/go-socks5 v0.1.3
+	github.com/things-go/go-socks5 v0.1.4
 )
 
 require (
@@ -40,7 +40,7 @@ require (
 	github.com/ipld/go-ipld-prime v0.24.0 // indirect
 	github.com/jackpal/go-nat-pmp v1.1.0 // indirect
 	github.com/jbenet/go-temp-err-catcher v0.1.0 // indirect
-	github.com/klauspost/cpuid/v2 v2.4.0 // indirect
+	github.com/klauspost/cpuid/v2 v2.4.1 // indirect
 	github.com/koron/go-ssdp v0.9.1 // indirect
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
 	github.com/libp2p/go-cidranger v1.1.0 // indirect
@@ -69,32 +69,33 @@ require (
 	github.com/multiformats/go-multistream v0.6.1 // indirect
 	github.com/multiformats/go-varint v0.1.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
+	github.com/pandatix/go-abnf v0.5.3 // indirect
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
 	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
 	github.com/pion/datachannel v1.6.3 // indirect
-	github.com/pion/dtls/v3 v3.1.10 // indirect
-	github.com/pion/ice/v4 v4.4.5 // indirect
-	github.com/pion/interceptor v0.1.49 // indirect
+	github.com/pion/dtls/v3 v3.1.15 // indirect
+	github.com/pion/ice/v4 v4.4.8 // indirect
+	github.com/pion/interceptor v0.1.51 // indirect
 	github.com/pion/logging v0.2.4 // indirect
 	github.com/pion/mdns/v2 v2.2.2 // indirect
 	github.com/pion/randutil v0.1.0 // indirect
-	github.com/pion/rtcp v1.2.19 // indirect
-	github.com/pion/rtp v1.10.5 // indirect
+	github.com/pion/rtcp v1.2.20 // indirect
+	github.com/pion/rtp v1.10.6 // indirect
 	github.com/pion/sctp v1.12.0 // indirect
 	github.com/pion/sdp/v3 v3.0.20 // indirect
 	github.com/pion/srtp/v3 v3.1.3 // indirect
 	github.com/pion/stun/v3 v3.1.7 // indirect
 	github.com/pion/stun/v4 v4.0.1 // indirect
 	github.com/pion/transport/v4 v4.1.1 // indirect
-	github.com/pion/transport/v5 v5.1.1 // indirect
-	github.com/pion/turn/v5 v5.1.2 // indirect
-	github.com/pion/webrtc/v4 v4.2.22 // indirect
-	github.com/prometheus/client_golang v1.24.1 // indirect
+	github.com/pion/transport/v5 v5.1.4 // indirect
+	github.com/pion/turn/v5 v5.1.3 // indirect
+	github.com/pion/webrtc/v4 v4.2.26 // indirect
+	github.com/prometheus/client_golang v1.25.0 // indirect
 	github.com/prometheus/client_model v0.6.3 // indirect
-	github.com/prometheus/common v0.72.0 // indirect
-	github.com/prometheus/procfs v0.22.0 // indirect
+	github.com/prometheus/common v0.73.1 // indirect
+	github.com/prometheus/procfs v0.23.0 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
-	github.com/quic-go/quic-go v0.63.0 // indirect
+	github.com/quic-go/quic-go v0.64.1 // indirect
 	github.com/quic-go/webtransport-go v0.13.0 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
@@ -115,16 +116,16 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.28.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/crypto v0.57.0 // indirect
-	golang.org/x/exp v0.0.0-20260908205506-85c1c2202aba // indirect
-	golang.org/x/mod v0.41.0 // indirect
-	golang.org/x/net v0.59.0 // indirect
-	golang.org/x/sync v0.23.0 // indirect
-	golang.org/x/sys v0.48.0 // indirect
-	golang.org/x/telemetry v0.0.0-20260924152758-ed294f943157 // indirect
-	golang.org/x/text v0.42.0 // indirect
+	golang.org/x/crypto v0.58.0 // indirect
+	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e // indirect
+	golang.org/x/mod v0.42.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
+	golang.org/x/sync v0.24.0 // indirect
+	golang.org/x/sys v0.49.0 // indirect
+	golang.org/x/telemetry v0.0.0-20261021172232-6cd571d43fbb // indirect
+	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	golang.org/x/tools v0.51.0 // indirect
+	golang.org/x/tools v0.52.0 // indirect
 	gonum.org/v1/gonum v0.17.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	lukechampine.com/blake3 v1.4.1 // indirect
